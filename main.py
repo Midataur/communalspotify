@@ -35,8 +35,8 @@ def generate_roomcode():
 def create_room(roomcode,tokens):
     r = redis_instance()
     data = {
-        'refresh_token': tokens[0],
-        'access_token': tokens[1]
+        'access_token': tokens[0],
+        'refresh_token': tokens[1]
     }
     r.delete(roomcode)
     r.hset(roomcode,mapping=data)
@@ -62,13 +62,12 @@ def get_api_token(authCode):
 
 def play_state(code):
     r = redis_instance()
-    token = r.hget(str(code),'access_token')
+    token = r.hget(str(code),'access_token').decode('utf-8')
 
-    header = {'Authorization': f'{token}'}
+    headers = {'Authorization': f'Bearer {token}'}
     url = 'https://api.spotify.com/v1/me/player'
 
-    resp = requests.get(url, headers=header)
-    print(resp.content)
+    resp = requests.get(url, headers=headers)
     return resp.json()
 
 ### SOCKETS ###
@@ -80,11 +79,14 @@ def connect(code):
 
 @socketio.on('playpause')
 def playpause(code):
-    status = play_state(code)['is_playing']
-    if status:
-        print('Playing')
-    else:
-        print('Not playing')
+    status = 'pause' if play_state(code)['is_playing'] else 'play'
+    
+    r = redis_instance()
+    token = r.hget(str(code),'access_token').decode('utf-8')
+
+    headers = {'Authorization': f'Bearer {token}'}
+    url = f'https://api.spotify.com/v1/me/player/{status}'
+    requests.put(url,headers=headers)
 
 ### ROUTES ###
 
