@@ -1,5 +1,7 @@
 **Current:**
-* `changed` create.html and index.html templates to have tailwind and nicer styles.
+* `added` notes on how to properly use js and preact (darcy)
+* `added` preactBase.html template (darcy)
+* `changed` create.html and index.html templates to have tailwind and nicer styles. (darcy)
 * `added` docs for how to build and get setup with tailwind. (darcy)
 * `added` styles.css and tailwind config (darcy)
 * `added` package.json (darcy)

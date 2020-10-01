@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#020202">
+	<link href="{{ url_for('static', filename='main.css') }}" type="text/css" rel="stylesheet">
+
+	<title>{% block title %}{%endblock%}</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" type="text/css">
+	<style type="text/css">
+		.base{
+			max-width:42rem;
+			
+		}
+		body,html{
+			height:100%;
+			background-color:#02060E;
+			color: #eee;
+			font-family: 'IBM Plex Sans', sans-serif;
+		}
+	</style>
+	
+	
+</head>
+<body>
+	<div class="base mx-auto p-4 text-xl">
+		<header id="header">
+			
+		</header>
+		<main class="mt-12" id="main">
+			
+		</main>
+	</div>
+	
+	<script type="module">
+		import { html, render, Component } from 'https://unpkg.com/htm/preact/standalone.module.js'
+		let main = html`
+			<p class="leading-tight text-5xl mb-8">
+				Looks like you <span class="bg-yellow-500 text-black">haven't added any code</span> yet. 
+			</p>
+			<p class="leading-normal text-2xl mb-8">
+				This is the <span class="bg-purple-300 text-black">preact</span> template. If you want the <span class="bg-blue-300 text-black">plain HTML</span> template, change "preactBase.html" to "base.html".
+			</p>
+			<p class="leading-normal text-xl mb-4">
+				Preact is expecting at least one custom element to render. Either "header" or "main". Make sure that you redefine these in your code block. (note: the template already declares "header" and "main", so if you do declare them in your code, the js will result in an error)
+			</p>
+			<p class="leading-normal text-xl mb-4">
+				You are currently viewing the default "header" and "main" components. The default header is the top nav bar (including the line). And the default main is this text.
+			</p>
+			`
+		let header = html`
+			<div class="flex justify-between border-b-2 py-3 items-center">
+				<h1 class="text-2xl font-bold">
+					<a href="/" class=" hover:bg-yellow-500 hover:text-black pr-1">Shareify</a>
+				</h1>
+				
+				<div class="flex ">
+						<div class="mr-3"><a href="/join" class="underline hover:bg-yellow-500 hover:text-black px-1">Join Room</a></div>
+						<div class=""><a href="/create" class="underline hover:bg-yellow-500 hover:text-black px-1">Create Room</a></div>
+				</div>
+			</div>`
+		{%block code %}
+		{%endblock%}
+		render(main, document.querySelector("#main"));
+		render(header, document.querySelector("#header"));
+	</script>
+
+</body>
+</html>
