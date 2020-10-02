@@ -1,4 +1,6 @@
 **Current:**
+* `changed` preactBase to reference the Header component (darcy)
+* `added` Header and Link components (darcy)
 * `changed` room template to use the preactBase (darcy)
 * `added` debug route so that we can test stuff (darcy)
 * `added` _defineProperty function to make doing public field declarations work, and also, getting it to work on more browsers (darcy)

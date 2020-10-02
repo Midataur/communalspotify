@@ -184,8 +184,11 @@ The component name in js should be the same as the filename excluding the extens
 
 | name | props | description |
 |------|-------|-------------|
-| `Spacer` | `{text}` | takes `text` and puts it in between two lines. adds y padding. If it can't find `text`, just displays a line. |
+| `Spacer` | `{text: string}` | takes `text` and puts it in between two lines. adds y padding. If it can't find `text`, just displays a line. |
+| `Header` | `{}` | Shows the header/navbar thingo |
+| `Link` | `{text: string, href: string, hoverColors: array}` | shows an `a` tag with innerHTML = text, href = href, and hover styling done by hoverColors. hoverColors is set by default to the yellow and black hightlight. |
 
+**Note**: some components require other components to be loaded, make sure that you load them in your template. `Header` and `Link` are imported by default.
 
 ## Building tailwindcss for dev:
 just run `npm i` inside this folder, and it'll install the required packages.
