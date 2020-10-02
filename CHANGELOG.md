@@ -1,4 +1,5 @@
 **Current:**
+* `added` 404 page (darcy)
 * `changed` preactBase to reference the Header component (darcy)
 * `added` Header and Link components (darcy)
 * `changed` room template to use the preactBase (darcy)

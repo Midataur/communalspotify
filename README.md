@@ -179,6 +179,17 @@ to import a component, add this to the top of the `code` block:
 
 The component name in js should be the same as the filename excluding the extension, not because it affects anything, just because it's nicer.
 
+Then to use a component, include the component like this in your htm template:
+```jsx
+html`
+	<${TheNameOfYourComponent> <//>
+`
+// or self-closing:
+html`
+	<${TheNameOfYourComponent />
+`
+```
+
 
 ### A list of our components:
 

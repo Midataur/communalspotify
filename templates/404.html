@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title%}404 | Shareify{%endblock%}
+{% block content %}
+		
+		<img src="{{ url_for('static', filename='winter-traveler-1600.png') }}" class="max-w-full mx-auto mb-8 px-4 sm:max-w-sm"/>
+		
+		<p class="text-5xl leading-tight mb-8 text-center ">
+		<b class="bg-red-300 text-black px-2">Error 404. </b>
+		</p>
+		<p class="text-xl leading-tight mb-8 text-center ">
+		We couldn't find the page you're trying to get to.
+		</p>
+		<p class="text-center">
+			<a href="javascript:history.back()" class="underline px-1 hover:bg-yellow-500 hover:text-black mr-2">go back</a>
+			<a href="/" class="underline px-1 hover:bg-yellow-500 hover:text-black mr-2">go to the homepage</a>
+		</p>
+
+
+{%endblock %}
