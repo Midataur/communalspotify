@@ -1,26 +1,41 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Shareify - Room</title>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
-        <script>
-            // Puts you in a room
-            var socket = io.connect('http://' + document.domain + ':' + location.port);
-            socket.on('connect', function() {
-                socket.emit('room_connect','{{roomcode}}');
-            });
-        </script>
-        <script>
-            function playpause() {
-                socket.emit('playpause', '{{roomcode}}');
-                console.log('sent');
-            }
-        </script>
-    </head>
-    <body>
-        <h1>Room - {{roomcode}}</h1>
-        <br/>
-        <button onclick="playpause()">Play/Pause</button>
-    </body>
-</html>
+{%extends "preactBase.html" %}
+{%block title%}Room | Shareify{%endblock%}
+{%block headerScripts%}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+{%endblock%}
+{%block code %}
+
+let socket = io.connect('http://' + document.domain + ':' + location.port);
+socket.on('connect', function() {
+    socket.emit('room_connect','{{roomcode}}');
+});
+
+const roomCode = "{{roomcode}}"
+
+class Player extends Component {
+    constructor() {
+        super();
+        
+        this.state = {
+            playing:false
+        } 
+        
+        _defineProperty(this, "playpause", (ev) => {
+            socket.emit('playpause', '{{roomcode}}');
+            console.log('sent');
+            ev.preventDefault();
+            this.setState({playing:!this.state.playing})
+        })
+      }
+    
+    render(){
+        return(
+            html`<button onClick=${this.playpause}>${this.state.playing? 'pause' : 'play'}</button>`
+        )
+    }
+}
+
+
+main = html`<${Player}/>`
+
+{%endblock%}

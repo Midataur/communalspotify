@@ -21,7 +21,8 @@
 		}
 	</style>
 	
-	
+	{%block headerScripts%}
+	{%endblock%}
 </head>
 <body>
 	<div class="base mx-auto p-4 text-xl">
@@ -35,6 +36,23 @@
 	
 	<script type="module">
 		import { html, render, Component } from 'https://unpkg.com/htm/preact/standalone.module.js'
+		
+		// lets you define properties of a object.
+		// technically you can do this with public field instances, but safari doesn't support that yet.
+		function _defineProperty(obj, key, value) {
+		  if (key in obj) {
+			Object.defineProperty(obj, key, {
+			  value: value,
+			  enumerable: true,
+			  configurable: true,
+			  writable: true
+			});
+		  } else {
+			obj[key] = value;
+		  }
+		  return obj;
+		}
+		
 		let main = html`
 			<p class="leading-tight text-5xl mb-8">
 				Looks like you <span class="bg-yellow-500 text-black">haven't added any code</span> yet. 

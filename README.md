@@ -76,6 +76,117 @@ because we are using the "module" type script tag, you have to make sure that yo
 
 In regards to variables: use `const/let` instead of `var`, as `const` and `let` are block scope, whereas `var` is function-scoped (ie. global). 
 
+### `_defineProperty()`
+
+`_defineProperty()` is a nice little helper function to let us define properties in browsers that dont support public field declarations. This is literally just copied from a babel build. 
+
+**How to use:**
+
+
+```js
+// instead of:
+class Hello extends Component {
+	state = {
+		value:""	
+	}
+	
+	onInput = (ev) => {
+		this.setState({
+			value: ev.target.value
+		})
+	}
+	
+	onSubmit = (ev) => {
+		ev.preventDefault()
+		
+		this.setState({
+			name:this.state.value
+		})
+	}
+	
+	render() {}
+}
+
+// write:
+class Hello extends Component {
+	constructor() {
+		super()
+		
+		_defineProperty(this, "state", {
+			value: ""
+		})
+		
+		_defineProperty(this, "onInput", (ev) => {
+			this.setState({
+				value: ev.target.value
+			})
+		})
+		
+		_defineProperty(this, "onSubmit", (ev) => {
+			ev.preventDefault()
+			
+			this.setState({
+				name: this.state.value
+			})
+		})
+	
+	}
+
+	render() {}
+}
+
+// you might also be able to write:
+class Hello extends Component {
+	constructor() {
+		super()
+		this.state = {
+			value: ""
+		}
+		
+		this.onInput = (ev) => {
+			this.setState({
+				value: ev.target.value
+			})
+		}
+		
+		this.onSubmit = (ev) => {
+			ev.preventDefault()
+		
+			this.setState({
+				name: this.state.value
+			})
+		}
+	
+	}
+	render() {}
+}
+
+// but i need to check if that works cross-browser. Babel doesnt try to convert the above code, so, uhh, ┐(￣ヘ￣)┌,  
+```
+
+basically, from what i can tell, doing public fields as in the first example just adds them to the class using the [`defineProperty` function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Public_class_fields#Public_static_fields). So the custom function basically just reimplements the default js behaviour, which makes sense, because it's babel.
+
+## Preact Components:
+all components live inside the `components` directory, under individual js files. 
+
+for information on how to make them, [have a look here](https://preactjs.com/guide/v10/components)
+
+to import a component, add this to the top of the `code` block:
+
+```
+{{component_import("Spacer", "WhateverTheFileNameIs", ...)}}
+```
+
+The component name in js should be the same as the filename excluding the extension, not because it affects anything, just because it's nicer.
+
+
+### A list of our components:
+
+| name | props | description |
+|------|-------|-------------|
+| `Spacer` | `{text}` | takes `text` and puts it in between two lines. adds y padding. If it can't find `text`, just displays a line. |
+
+
 ## Building tailwindcss for dev:
 just run `npm i` inside this folder, and it'll install the required packages.
 

@@ -1,0 +1,42 @@
+{%extends "preactBase.html" %}
+{%block title%}A simple demo (clock) | Shareify{%endblock%}
+{%block code %}
+
+class App extends Component {
+	constructor(...args) {
+		super(...args);
+		
+		this.state =  {
+			value: ""
+		}
+		
+		this.onInput = (ev) => {
+			this.setState({
+				value: ev.target.value
+			});
+		}
+	
+		this.onSubmit = (ev) => {
+			ev.preventDefault();
+			
+			this.setState({name:this.state.value})
+		}
+		
+	}
+	
+
+  render() {
+	return (
+	  html`<div>
+		<h1>Hello, ${this.state.name}!</h1>
+		<form onSubmit=${this.onSubmit}>
+		  <input type="text" value=${this.state.value} onInput=${this.onInput} />
+		  <button type="submit">Update</button>
+		</form>
+	  </div>`
+	);
+  }
+}
+main = html`<${App}/>`
+
+{%endblock%}

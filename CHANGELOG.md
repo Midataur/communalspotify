@@ -1,4 +1,8 @@
 **Current:**
+* `changed` room template to use the preactBase (darcy)
+* `added` debug route so that we can test stuff (darcy)
+* `added` _defineProperty function to make doing public field declarations work, and also, getting it to work on more browsers (darcy)
+* `added` components system and functions (darcy)
 * `added` notes on how to properly use js and preact (darcy)
 * `added` preactBase.html template (darcy)
 * `changed` create.html and index.html templates to have tailwind and nicer styles. (darcy)
@@ -13,10 +17,10 @@
 **Terms:**
 * added — the creation of something
 * changed — the changing of something
-* deleted — the removing of something.
+* removed — getting rid of something
 * *note*: there may be some overlap with the terms (eg. adding a function, but changing a file). In these cases use the one you feel most appropriate.
 
 **Format:**
 ```
-`added/changed/deleted` ... (name)
+`added/changed/removed` ... (name)
 ```
