@@ -35,9 +35,12 @@ def generate_roomcode():
 
 def create_room(roomcode,tokens):
     r = redis_instance()
+    secret = (str(roomcode)+tokens[0]).encode('utf-8')
+    secret = hashlib.sha256(secret).hexdigest()
     data = {
         'access_token': tokens[0],
-        'refresh_token': tokens[1]
+        'refresh_token': tokens[1],
+        'secret': secret
     }
     r.delete(roomcode)
     r.hset(roomcode,mapping=data)
@@ -63,7 +66,7 @@ def get_api_token(authCode):
 
 def play_state(code):
     r = redis_instance()
-    token = r.hget(str(code),'access_token').decode('utf-8')
+    token = r.hget(code,'access_token').decode('utf-8')
 
     headers = {'Authorization': f'Bearer {token}'}
     url = 'https://api.spotify.com/v1/me/player'
@@ -103,6 +106,13 @@ def debug_view():
 
 @app.route('/create')
 def create_user_facing():
+    if 'roomCode' in request.cookies and 'secret' in request.cookies:
+        print('Trying easy log')
+        r = redis_instance()
+        roomcode = request.cookies['roomCode']
+        secret = r.hget(roomcode,'secret').decode('utf-8')
+        if secret == request.cookies['secret']:
+            return '<script>window.location = "/room"</script>'
     return render_template('create.html',client_id='cb6e434f986247b7be00bba2ec03e9c0')
 
 @app.route('/create/actual')
@@ -111,11 +121,14 @@ def actual_create():
         tokens = get_api_token(request.args['code'])
         roomcode = generate_roomcode()
         create_room(roomcode,tokens)
-        secret = (str(roomcode)+tokens[1]).encode('utf-8')
-        secret = hashlib.sha256(secret).hexdigest()
+
+        r = redis_instance()
+        secret = r.hget(roomcode,'secret')
+
         resp = make_response(f"""<script>window.location = '/room';</script>""")
         resp.set_cookie('roomCode',roomcode)
         resp.set_cookie('secret',secret)
+
         return resp
     return "You need to login for the webapp to work"
 
@@ -126,7 +139,7 @@ def join():
     else:
         r = redis_instance()
         roomcode = request.form['code']
-        if r.exists(str(roomcode)):
+        if r.exists(roomcode):
             resp = make_response(f"""<script>window.location = '/room';</script>""")
             resp.set_cookie('roomCode',roomcode)
             return resp
@@ -136,7 +149,7 @@ def join():
 @app.route('/room')
 def room():
     roomcode = request.cookies['roomCode']
-    return render_template('room.html',roomcode="32039")
+    return render_template('room.html',roomcode=roomcode)
 
 @app.errorhandler(404)
 def page_not_found(e):
