@@ -1,4 +1,5 @@
 **Current:**
+* `added` search api (max)
 * `added` 404 page (darcy)
 * `changed` preactBase to reference the Header component (darcy)
 * `added` Header and Link components (darcy)

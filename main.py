@@ -72,6 +72,23 @@ def play_state(code):
     print(resp.content)
     return resp.json()
 
+#this is a forwarder to the spotify api so we don't give the authtokens to every client
+@app.route('/api/search')
+def spotify_search():
+    params = {
+        'type': 'track',
+        'q': request.args['q']
+    }
+    
+    code = request.args['roomcode']
+    r = redis_instance()
+    token = r.hget(code,'access_token').decode('utf-8')
+
+    headers = {'Authorization': f'Bearer {token}'}
+    url = 'https://api.spotify.com/v1/search'
+
+    return requests.get(url, headers=headers, params=params).json()
+
 ### SOCKETS ###
 
 @socketio.on('room_connect')
