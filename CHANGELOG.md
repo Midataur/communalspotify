@@ -21,6 +21,7 @@
 * added — the creation of something
 * changed — the changing of something
 * removed — getting rid of something
+* fixed
 * *note*: there may be some overlap with the terms (eg. adding a function, but changing a file). In these cases use the one you feel most appropriate.
 
 **Format:**
