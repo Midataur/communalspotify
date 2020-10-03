@@ -35,12 +35,9 @@ def generate_roomcode():
 
 def create_room(roomcode,tokens):
     r = redis_instance()
-    secret = (str(roomcode)+tokens[0]).encode('utf-8')
-    secret = hashlib.sha256(secret).hexdigest()
     data = {
         'access_token': tokens[0],
-        'refresh_token': tokens[1],
-        'secret': secret
+        'refresh_token': tokens[1]
     }
     r.delete(roomcode)
     r.hset(roomcode,mapping=data)
@@ -72,6 +69,7 @@ def play_state(code):
     url = 'https://api.spotify.com/v1/me/player'
 
     resp = requests.get(url, headers=headers)
+    print(resp.content)
     return resp.json()
 
 ### SOCKETS ###
@@ -84,6 +82,7 @@ def connect(code):
 @socketio.on('playpause')
 def playpause(code):
     status = 'pause' if play_state(code)['is_playing'] else 'play'
+    print(status)
     
     r = redis_instance()
     token = r.hget(str(code),'access_token').decode('utf-8')
@@ -91,6 +90,15 @@ def playpause(code):
     headers = {'Authorization': f'Bearer {token}'}
     url = f'https://api.spotify.com/v1/me/player/{status}'
     requests.put(url,headers=headers)
+
+@socketio.on('skip')
+def skip(code):
+    r = redis_instance()
+    token = r.hget(str(code),'access_token').decode('utf-8')
+
+    headers = {'Authorization': f'Bearer {token}'}
+    url = f'https://api.spotify.com/v1/me/player/next'
+    requests.post(url,headers=headers)
 
 ### ROUTES ###
 
@@ -106,12 +114,12 @@ def debug_view():
 
 @app.route('/create')
 def create_user_facing():
-    if 'roomCode' in request.cookies and 'secret' in request.cookies:
+    if 'roomCode' in request.cookies and 'authCode' in request.cookies:
         print('Trying easy log')
         r = redis_instance()
         roomcode = request.cookies['roomCode']
-        secret = r.hget(roomcode,'secret').decode('utf-8')
-        if secret == request.cookies['secret']:
+        authCode = r.hget(roomcode,'access_token').decode('utf-8')
+        if authCode == request.cookies['authCode']:
             return '<script>window.location = "/room"</script>'
     return render_template('create.html',client_id='cb6e434f986247b7be00bba2ec03e9c0')
 
@@ -123,11 +131,11 @@ def actual_create():
         create_room(roomcode,tokens)
 
         r = redis_instance()
-        secret = r.hget(roomcode,'secret')
+        authCode = r.hget(roomcode,'access_token')
 
         resp = make_response(f"""<script>window.location = '/room';</script>""")
         resp.set_cookie('roomCode',roomcode)
-        resp.set_cookie('secret',secret)
+        resp.set_cookie('authCode',authCode)
 
         return resp
     return "You need to login for the webapp to work"

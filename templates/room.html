@@ -24,7 +24,7 @@ class Player extends Component {
         
         _defineProperty(this, "playpause", (ev) => {
             socket.emit('playpause', '{{roomcode}}');
-            console.log('sent');
+            console.log('sent playpause');
             ev.preventDefault();
             this.setState({playing:!this.state.playing})
         })
@@ -37,7 +37,24 @@ class Player extends Component {
     }
 }
 
+class Skip extends Component {
+    constructor() {
+        super();
 
-main = html`<${Player}/>`
+        _defineProperty(this, "skip", (ev) => {
+            socket.emit('skip', '{{roomcode}}');
+            console.log('sent skip');
+            ev.preventDefault();
+        })
+      }
+    
+    render(){
+        return(
+            html`<button onClick=${this.skip}>skip</button>`
+        )
+    }
+}
+
+main = html`<${Player}/><br/><${Skip}/>`
 
 {%endblock%}
