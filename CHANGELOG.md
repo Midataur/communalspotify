@@ -26,5 +26,5 @@
 
 **Format:**
 ```
-`added/changed/removed` ... (name)
+`added/changed/removed/fixed` ... (name)
 ```
