@@ -1,39 +1,42 @@
 {%extends "preactBase.html" %}
 {%block title%}A simple demo (clock) | Shareify{%endblock%}
+{%block headerScripts %}
+{%endblock%}
 {%block code %}
+
 
 class App extends Component {
 	constructor(...args) {
 		super(...args);
 		
 		this.state =  {
-			value: ""
+			value: "",
+			open: false
 		}
 		
-		this.onInput = (ev) => {
-			this.setState({
-				value: ev.target.value
-			});
-		}
-	
-		this.onSubmit = (ev) => {
-			ev.preventDefault();
-			
-			this.setState({name:this.state.value})
-		}
+		_defineProperty(this, "handleMouseDown", () => {
+			this.setState({open: !this.state.open});
+		})
+		
+		_defineProperty(this, "handleTouchStart", (ev) => {
+			ev.preventDefault()
+			this.handleMouseDown()
+		})
+
+		
 		
 	}
 	
 
   render() {
 	return (
-	  html`<div>
-		<h1>Hello, ${this.state.name}!</h1>
-		<form onSubmit=${this.onSubmit}>
-		  <input type="text" value=${this.state.value} onInput=${this.onInput} />
-		  <button type="submit">Update</button>
-		</form>
-	  </div>`
+	  html`
+	  <button
+		onMouseDown=${this.handleMouseDown}
+		onTouchStart=${this.handleTouchStart}>
+		Toggle
+	  </button>
+	  `
 	);
   }
 }
