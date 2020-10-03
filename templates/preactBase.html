@@ -34,9 +34,13 @@
 		</main>
 	</div>
 	
+	
+	
+	<!--<script src="{{ url_for('static', filename='preact-motion.prod.js') }}" crossorigin="anonymous"></script>-->
+
 	<script type="module">
 		import { html, render, Component } from 'https://unpkg.com/htm/preact/standalone.module.js'
-		
+
 		// lets you define properties of a object.
 		// technically you can do this with public field instances, but safari doesn't support that yet.
 		function _defineProperty(obj, key, value) {
@@ -65,12 +69,12 @@
 			</p>
 			<p class="leading-normal text-xl mb-4">
 				You are currently viewing the default "header" and "main" components. The default header is the top nav bar (including the line). And the default main is this text.
-			</p>/room/room
+			</p>
 			`
 		{{component_import("Header", "Link")}}
-		
 		let header = html`
 			<${Header} />`
+		
 		{%block code %}
 		{%endblock%}
 		render(main, document.querySelector("#main"));
