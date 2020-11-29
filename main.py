@@ -71,8 +71,9 @@ def play_state(code):
     resp = requests.get(url, headers=headers)
     print(resp.content)
     return resp.json()
+## API ROUTES
 
-#this is a forwarder to the spotify api so we don't give the authtokens to every client
+#this is a forwarder to the Spotify api so we don't give the authtokens to every client
 @app.route('/api/search')
 def spotify_search():
     params = {
@@ -88,6 +89,10 @@ def spotify_search():
     url = 'https://api.spotify.com/v1/search'
 
     return requests.get(url, headers=headers, params=params).json()
+
+@app.route('/api/getPlayState')
+def get_play_state():
+    return play_state(request.args['roomcode'])
 
 ### SOCKETS ###
 
