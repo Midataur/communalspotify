@@ -65,6 +65,17 @@ class Skip extends Component {
     }
 }
 
-Main = () => (html`${roomCode}<${Player}/><br/><${Skip}/>`) 
+Main = () => (html`
+    <${SlotContent} name="headerNav">
+        <div>
+            Room Code: 
+            <span class="bg-blue-300 text-black px-1 ml-2">${roomCode}</span>
+        </div>
+    <//>
+    <${Player}/>
+    <br/>
+    <${Skip}/>
+    
+`) 
 
 {%endblock%}
