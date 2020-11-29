@@ -14,7 +14,7 @@ fix(styles): padding on buttons
 feat(templates): use base template for join.html
 ```
 
-possible types are [commitizen](https://github.com/commitizen/cz-cli) standard.
+possible types are [commitizen](https://github.com/commitizen/conventional-commit-types/blob/master/index.json) standard.
 
 ![types](https://github.com/commitizen/cz-cli/raw/master/meta/screenshots/add-commit.png)
 
