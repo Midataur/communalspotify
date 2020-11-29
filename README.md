@@ -18,14 +18,14 @@ And you're done, you've made a template using preact!
 
 Now to change the default contents:
 
-`preactBase.html` has the variables `header` and `main` already declared. Those are our two components. 
+`preactBase.html` has the function `Main` already declared. Those are our two components. 
 
-Just add code that redefines the `header` and/or `main` components, and preact will render that component instead of the default. 
+Just add code that redefines the `Main` components, and preact will render that component instead of the default. 
 
 Instead of using JSX as the html language inside our js code, we use [htm](https://github.com/developit/htm) which is quite small, and has great integration with preact. To use it, just make a tagged template literal with `html`.
 
 ```js
-main = html`<p>oooh, html </p>`
+Main = () => (html`<p>oooh, html </p>`) 
 ```
 
 > Think of template literals like python's f-strings. where instead of using `{}` to include code, you use `${}`.
@@ -196,10 +196,30 @@ html`
 | name | props | description |
 |------|-------|-------------|
 | `Spacer` | `{text: string}` | takes `text` and puts it in between two lines. adds y padding. If it can't find `text`, just displays a line. |
-| `Header` | `{}` | Shows the header/navbar thingo |
+| `DefaultHeader` | `{}` | Shows the header/navbar thingo. |
 | `Link` | `{text: string, href: string, hoverColors: array}` | shows an `a` tag with innerHTML = text, href = href, and hover styling done by hoverColors. hoverColors is set by default to the yellow and black hightlight. |
 
 **Note**: some components require other components to be loaded, make sure that you load them in your template. `Header` and `Link` are imported by default.
+
+## Slots
+in order to have the components talk to other parts without having to pass down props, we can use slots.
+
+basically a slot is an element that has some default content, that can then be overwritten by another element somewhere else.
+
+```jsx
+
+<${Slot} name="foo">
+    Fallback content
+<//>
+<${SlotContent} name="foo">
+    content to replace the other one with.
+<//>
+
+```
+
+Those two elements dont have to be in the same level or anything, they talk to each other using the context api, but you don't need to know how that works.
+
+The header component's nav elements are included in the slot `"headerNav"`. this is so you can basically change the contents of it to like, show the room code there.
 
 ## Building tailwindcss for dev:
 just run `npm i` inside this folder, and it'll install the required packages.
