@@ -18,11 +18,17 @@ const roomCode = "{{roomcode}}"
 class Player extends Component {
     constructor() {
         super();
-        
         this.state = {
-            playing:false
+            playing:false,
         } 
         
+        fetch(`/api/getPlayState?roomcode=${roomCode}`)
+            .then(r => r.json())
+            .catch(() => {error:"fetching play state failed"})
+            .then(data => this.state.spotifyData = data)
+        
+        
+        console.log(this.state)
         _defineProperty(this, "playpause", (ev) => {
             socket.emit('playpause', '{{roomcode}}');
             console.log('sent playpause');
@@ -33,7 +39,10 @@ class Player extends Component {
     
     render(){
         return(
-            html`<button onClick=${this.playpause}>${this.state.playing? 'pause' : 'play'}</button>`
+            html`
+            <button onClick=${this.playpause}>${this.state.playing? 'pause' : 'play'}</button>
+            ${this.state.spotifyData ? this.state.spotifyData.item.name : '' }
+            `
         )
     }
 }
@@ -56,6 +65,6 @@ class Skip extends Component {
     }
 }
 
-main = html`<${Player}/><br/><${Skip}/>`
+Main = () => (html`${roomCode}<${Player}/><br/><${Skip}/>`) 
 
 {%endblock%}
