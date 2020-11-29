@@ -22,12 +22,9 @@ class Player extends Component {
             playing:false,
         } 
         
-        fetch(`/api/getPlayState?roomcode=${roomCode}`)
-            .then(r => r.json())
-            .catch(() => {error:"fetching play state failed"})
-            .then(data => this.state.spotifyData = data)
         
         
+       
         console.log(this.state)
         _defineProperty(this, "playpause", (ev) => {
             socket.emit('playpause', '{{roomcode}}');
@@ -36,12 +33,22 @@ class Player extends Component {
             this.setState({playing:!this.state.playing})
         })
       }
-    
+     
+    componentDidMount() {
+        fetch(`/api/getPlayState?roomcode=${roomCode}`)
+          .then(r => r.json())
+          .catch(() => {error:"fetching play state failed"})
+          .then(data => this.setState({
+              spotifyData: data
+          }))
+    }
+        
     render(){
         return(
             html`
             <button onClick=${this.playpause}>${this.state.playing? 'pause' : 'play'}</button>
-            ${this.state.spotifyData ? this.state.spotifyData.item.name : '' }
+            <br/>
+            Title: ${this.state.spotifyData ? this.state.spotifyData.item.name : '' }
             `
         )
     }
@@ -64,6 +71,7 @@ class Skip extends Component {
         )
     }
 }
+
 
 Main = () => (html`
     <${SlotContent} name="headerNav">
