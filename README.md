@@ -1,6 +1,26 @@
 # communalspotify
 A webapp for democratizing music in public spaces
 
+## Changelog
+just do git commits with this template:
+```
+<type>(scope): <subject>
+```
+
+example:
+```
+fix(styles): padding on buttons
+
+feat(templates): use base template for join.html
+```
+
+possible types are [commitizen](https://github.com/commitizen/cz-cli) standard.
+
+![types](https://github.com/commitizen/cz-cli/raw/master/meta/screenshots/add-commit.png)
+
+uses [git-chglog](https://github.com/git-chglog/git-chglog) to generate changelogs.
+
+
 ## Preact and javascript:
 So, we are using [preact](https://preactjs.com) for this project, as it allows us to do fun reactivity stuff pretty easily. and is much smaller than react + react-dom.
 
