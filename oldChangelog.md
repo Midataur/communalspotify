@@ -1,3 +1,26 @@
+# new changelog style:
+just do git commits with this template:
+```
+<type>(scope): <subject>
+```
+
+example:
+```
+fix(styles): padding on buttons
+
+feat(templates): use base template for join.html
+```
+
+possible types are [commitizen](https://github.com/commitizen/cz-cli) standard.
+
+![types](https://github.com/commitizen/cz-cli/raw/master/meta/screenshots/add-commit.png)
+
+uses [git-chglog](https://github.com/git-chglog/git-chglog) to generate changelogs.
+
+---
+
+# old stuff
+
 **Current:**
 * `added` search api (max)
 * `added` 404 page (darcy)
