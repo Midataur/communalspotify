@@ -6,8 +6,6 @@
 {%endblock%}
 {%block code %}
 
-
-
 let socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function() {
     socket.emit('room_connect','{{roomcode}}');
@@ -22,17 +20,15 @@ class Player extends Component {
             playing:false,
         } 
         
-        
-        
-       
         console.log(this.state)
+        
         _defineProperty(this, "playpause", (ev) => {
             socket.emit('playpause', '{{roomcode}}');
             console.log('sent playpause');
             ev.preventDefault();
             this.setState({playing:!this.state.playing})
         })
-      }
+    }
      
     componentDidMount() {
         fetch(`/api/getPlayState?roomcode=${roomCode}`)
