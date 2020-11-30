@@ -141,6 +141,7 @@ def debug_view():
 
 @app.route('/create')
 def create_user_facing():
+    global CLIENT_ID, REDIR_URI
     if 'roomCode' in request.cookies and 'authCode' in request.cookies:
         try:
             print('Trying easy log')
@@ -151,7 +152,7 @@ def create_user_facing():
                 return '<script>window.location = "/room"</script>'
         except AttributeError:
             pass
-    return render_template('create.html',client_id='cb6e434f986247b7be00bba2ec03e9c0')
+    return render_template('create.html',client_id=CLIENT_ID,redir_uri=REDIR_URI)
 
 @app.route('/create/actual')
 def actual_create():
