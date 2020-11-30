@@ -22,6 +22,13 @@ class Player extends Component {
         
         console.log(this.state)
         
+        _defineProperty(this, "getColours", (imgSRC) => {
+            const colours = Vibrant.from(imgSRC)
+                .getPalette()
+                .then((palette) => palette)
+            return colours
+        })
+        
         _defineProperty(this, "fetchData", (ev) => {
             fetch(`/api/getPlayState?roomcode=${roomCode}`)
               .then(r => r.json())
@@ -29,6 +36,10 @@ class Player extends Component {
               .then(data => this.setState({
                   spotifyData: data
               }))
+              .then(()=> this.getColours(this.state.spotifyData.item.album.images[0].url))
+              .then((palette) => this.setState({palette}))
+              .then(()=>console.log(this.state))
+              
         })
         
         _defineProperty(this, "playpause", (ev) => {
@@ -42,8 +53,6 @@ class Player extends Component {
             socket.emit('skip', '{{roomcode}}');
             console.log('sent skip');
             setTimeout(() => {  this.fetchData() }, 1000);
-
-            
         })
         
         
@@ -63,6 +72,20 @@ class Player extends Component {
     render(){
         return(
             html`
+            <div class="px-2 sm:px-8">
+                <div class="relative aspect-ratio-square rounded-lg">
+                    <img 
+                        src="${this.state.spotifyData ? this.state.spotifyData.item.album.images[0].url : '' }"
+                        style="box-shadow:0px 0px 20px 4px rgba(${
+                            this.state.palette ?
+                            this.state.palette.DarkVibrant._rgb.join(',') :
+                            '0,0,0'
+                        },0.5)"
+                        class="rounded-lg absolute w-full h-full object-cover"
+                    />
+                </div> 
+            </div>
+            <br/>
             <button onClick=${this.playpause}>${this.state.playing? 'pause' : 'play'}</button>
             <br/>
             Title: ${this.state.spotifyData ? this.state.spotifyData.item.name : '' }
