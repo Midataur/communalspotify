@@ -19,7 +19,8 @@
   "homepage": "https://github.com/Collective-Fullstack/communalspotify#readme",
   "dependencies": {
     "preact": "^10.5.4",
-    "tailwindcss": "^1.8.10"
+    "tailwindcss": "1.8.10",
+    "tailwindcss-aspect-ratio": "^3.0.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.2"
