@@ -137,12 +137,15 @@ def debug_view():
 @app.route('/create')
 def create_user_facing():
     if 'roomCode' in request.cookies and 'authCode' in request.cookies:
-        print('Trying easy log')
-        r = redis_instance()
-        roomcode = request.cookies['roomCode']
-        authCode = r.hget(roomcode,'access_token').decode('utf-8')
-        if authCode == request.cookies['authCode']:
-            return '<script>window.location = "/room"</script>'
+        try:
+            print('Trying easy log')
+            r = redis_instance()
+            roomcode = request.cookies['roomCode']
+            authCode = r.hget(roomcode,'access_token').decode('utf-8')
+            if authCode == request.cookies['authCode']:
+                return '<script>window.location = "/room"</script>'
+        except AttributeError:
+            pass
     return render_template('create.html',client_id='cb6e434f986247b7be00bba2ec03e9c0')
 
 @app.route('/create/actual')
