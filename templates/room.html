@@ -84,6 +84,13 @@ class Player extends Component {
     render(){
         return(
             html`
+            
+            <style>
+            :root{
+                ${this.state.palette ? this.getCSSPaletteVars("DarkMuted") : ''}
+            }
+            
+            </style>
             <div class="px-2 sm:px-8">
                 <div class="relative aspect-ratio-square rounded-lg">
                     <!--<img 
