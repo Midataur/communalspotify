@@ -74,6 +74,11 @@ class Player extends Component {
             html`
             <div class="px-2 sm:px-8">
                 <div class="relative aspect-ratio-square rounded-lg">
+                    <!--<img 
+                        src="${this.state.spotifyData ? this.state.spotifyData.item.album.images[0].url : '' }"
+                        class="rounded-lg absolute w-full h-full object-cover opacity-50"
+                        style="filter: blur(20px)"
+                    />-->
                     <img 
                         src="${this.state.spotifyData ? this.state.spotifyData.item.album.images[0].url : '' }"
                         style="box-shadow:0px 0px 20px 4px rgba(${
