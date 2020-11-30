@@ -37,6 +37,16 @@ class Player extends Component {
             ev.preventDefault();
             this.setState({playing:!this.state.playing})
         })
+        
+        _defineProperty(this, "skip", (ev) => {
+            socket.emit('skip', '{{roomcode}}');
+            console.log('sent skip');
+            setTimeout(() => {  this.fetchData() }, 1000);
+
+            
+        })
+        
+        
     }
      
     componentDidMount() {
@@ -56,28 +66,13 @@ class Player extends Component {
             <button onClick=${this.playpause}>${this.state.playing? 'pause' : 'play'}</button>
             <br/>
             Title: ${this.state.spotifyData ? this.state.spotifyData.item.name : '' }
+            <br/>
+            <button onClick=${this.skip}>skip</button>
             `
         )
     }
 }
 
-class Skip extends Component {
-    constructor() {
-        super();
-
-        _defineProperty(this, "skip", (ev) => {
-            socket.emit('skip', '{{roomcode}}');
-            console.log('sent skip');
-            ev.preventDefault();
-        })
-      }
-    
-    render(){
-        return(
-            html`<button onClick=${this.skip}>skip</button>`
-        )
-    }
-}
 
 
 Main = () => (html`
@@ -88,8 +83,7 @@ Main = () => (html`
         </div>
     <//>
     <${Player}/>
-    <br/>
-    <${Skip}/>
+
     
 `) 
 
