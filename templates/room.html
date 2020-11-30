@@ -22,6 +22,15 @@ class Player extends Component {
         
         console.log(this.state)
         
+        _defineProperty(this, "fetchData", (ev) => {
+            fetch(`/api/getPlayState?roomcode=${roomCode}`)
+              .then(r => r.json())
+              .catch(() => {error:"fetching play state failed"})
+              .then(data => this.setState({
+                  spotifyData: data
+              }))
+        })
+        
         _defineProperty(this, "playpause", (ev) => {
             socket.emit('playpause', '{{roomcode}}');
             console.log('sent playpause');
@@ -31,13 +40,15 @@ class Player extends Component {
     }
      
     componentDidMount() {
-        fetch(`/api/getPlayState?roomcode=${roomCode}`)
-          .then(r => r.json())
-          .catch(() => {error:"fetching play state failed"})
-          .then(data => this.setState({
-              spotifyData: data
-          }))
+        this.fetchData()
+        this.timer = setInterval(() => {
+              this.fetchData()
+        }, 15000); // probably should make this check only a couple of times
     }
+    componentWillUnmount() {
+        // stop when not renderable
+        clearInterval(this.timer);
+      }
         
     render(){
         return(
