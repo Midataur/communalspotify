@@ -11,8 +11,15 @@ module.exports = {
     ],
   },
   theme: {
-    extend: {},
+    aspectRatio: {
+      'square':[1,1]
+    },
+    extend: {
+      
+    },
   },
   variants: {},
-  plugins: [],
+  plugins: [
+    require('tailwindcss-aspect-ratio')
+  ],
 }
