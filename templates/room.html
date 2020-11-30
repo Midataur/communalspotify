@@ -46,6 +46,7 @@ class Player extends Component {
             socket.emit('playpause', '{{roomcode}}');
             console.log('sent playpause');
             ev.preventDefault();
+            this.fetchData()
             this.setState({playing:!this.state.playing})
         })
         
@@ -55,6 +56,17 @@ class Player extends Component {
             setTimeout(() => {  this.fetchData() }, 1000);
         })
         
+        _defineProperty(this, "getCSSPaletteVars", (profile="Vibrant") => {
+            let currentPalette = this.state.palette[profile]._hsl ? 
+            this.state.palette[profile]._hsl : 
+            RGBtoHSL(this.state.palette[profile]._rgb[0], this.state.palette[profile]._rgb[1], this.state.palette[profile]._rgb[2])     
+            
+            return `
+                --page-bg-h:${currentPalette[0]*360};
+                --page-bg-s:${currentPalette[1]*100};
+                --page-bg-l:${currentPalette[2]*100};
+            `
+        })
         
     }
      
@@ -72,6 +84,13 @@ class Player extends Component {
     render(){
         return(
             html`
+            
+            <style>
+            :root{
+                ${this.state.palette ? this.getCSSPaletteVars("DarkMuted") : ''}
+            }
+            
+            </style>
             <div class="px-2 sm:px-8">
                 <div class="relative aspect-ratio-square rounded-lg">
                     <!--<img 
@@ -81,19 +100,15 @@ class Player extends Component {
                     />-->
                     <img 
                         src="${this.state.spotifyData ? this.state.spotifyData.item.album.images[0].url : '' }"
-                        style="box-shadow:0px 0px 20px 4px rgba(${
-                            this.state.palette ?
-                            this.state.palette.DarkVibrant._rgb.join(',') :
-                            '0,0,0'
-                        },0.5)"
+                        
                         class="rounded-lg absolute w-full h-full object-cover"
                     />
                 </div> 
             </div>
             <div class="flex justify-between px-3 sm:px-10 py-4">
             <button onClick=${this.playpause} class="underline">${this.state.playing? 'pause' : 'play'}</button>
-            <div>
-            ${this.state.spotifyData ? this.state.spotifyData.item.name : '...' }
+            <div class="flex-grow text-center">
+            ${this.state.spotifyData ? this.state.spotifyData.item.name : '...' } — ${this.state.spotifyData ? this.state.spotifyData.item.artists[0].name : '...'}
             </div>
             <button onClick=${this.skip} class="underline">skip</button>
             </div>
@@ -109,7 +124,7 @@ Main = () => (html`
     <${SlotContent} name="headerNav">
         <div>
             Room Code: 
-            <span class="bg-blue-300 text-black px-1 ml-2">${roomCode}</span>
+            <span class="bg-page-contrast text-page-bg px-1 ml-2">${roomCode}</span>
         </div>
     <//>
     <${Player}/>

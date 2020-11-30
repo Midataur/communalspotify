@@ -3,7 +3,7 @@
 function DefaultHeader(){
 	return (
 		html`
-			<div class="flex justify-between border-b-2 py-3 items-center">
+			<div class="flex justify-between border-b-2 border-page-contrast py-3 items-center">
 				<h1 class="text-2xl font-bold">
 					<a href="/" class=" hover:bg-yellow-500 hover:text-black pr-1">Shareify</a>
 				</h1>

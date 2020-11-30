@@ -6,15 +6,36 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap" type="text/css">
 <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
 <style type="text/css">
+	:root{
+		--page-bg-h:220;
+		--page-bg-s:75;
+		--page-bg-l:3;
+		
+		--page-bg: hsl(var(--page-bg-h), calc(var(--page-bg-s) * 1%), calc(var(--page-bg-l) * 1%));
+		
+		--page-bg-contrast-l: calc((var(--page-bg-l) - 50) * -100%);
+		--page-bg-contrast: hsl(var(--page-bg-h), calc(var(--page-bg-s) * 1%), var(--page-bg-contrast-l));
+	}
 	.base{
 		max-width:42rem;
 		
 	}
 	body,html{
 		height:100%;
-		background-color:#02060E;
-		color: #eee;
+		background-color:var(--page-bg);
+		color: var(--page-bg-contrast);
 		font-family: 'IBM Plex Sans', sans-serif;
+		transition: background 1s ease, color 1s ease;
+	}
+	
+	.border-page-contrast {
+		border-color: var(--page-bg-contrast)
+	}
+	.bg-page-contrast {
+		background-color: var(--page-bg-contrast)
+	}
+	.text-page-bg {
+		color: var(--page-bg)
 	}
 </style>
 
