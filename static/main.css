@@ -21025,6 +21025,10 @@ video {
           animation: bounce 1s infinite;
 }
 
+.aspect-ratio-square {
+  padding-bottom: 100%;
+}
+
 @media (min-width: 640px) {
   .sm\:container {
     width: 100%;
@@ -41397,6 +41401,10 @@ video {
   .sm\:animate-bounce {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
+  }
+
+  .sm\:aspect-ratio-square {
+    padding-bottom: 100%;
   }
 }
 
@@ -61773,6 +61781,10 @@ video {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
   }
+
+  .md\:aspect-ratio-square {
+    padding-bottom: 100%;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -82148,6 +82160,10 @@ video {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
   }
+
+  .lg\:aspect-ratio-square {
+    padding-bottom: 100%;
+  }
 }
 
 @media (min-width: 1280px) {
@@ -102522,5 +102538,9 @@ video {
   .xl\:animate-bounce {
     -webkit-animation: bounce 1s infinite;
             animation: bounce 1s infinite;
+  }
+
+  .xl\:aspect-ratio-square {
+    padding-bottom: 100%;
   }
 }
