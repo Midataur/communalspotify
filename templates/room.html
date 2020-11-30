@@ -100,11 +100,7 @@ class Player extends Component {
                     />-->
                     <img 
                         src="${this.state.spotifyData ? this.state.spotifyData.item.album.images[0].url : '' }"
-                        style="box-shadow:0px 0px 20px 4px rgba(${
-                            this.state.palette ?
-                            this.state.palette.DarkVibrant._rgb.join(',') :
-                            '0,0,0'
-                        },0.5)"
+                        
                         class="rounded-lg absolute w-full h-full object-cover"
                     />
                 </div> 
