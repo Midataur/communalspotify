@@ -13,6 +13,10 @@ app = Flask(__name__)
 app.config['DEBUG'] = True if __name__ == '__main__' else False
 socketio = SocketIO(app)
 
+REDIR_URI = os.environ.get('REDIRECT_URI')
+CLIENT_ID = os.environ.get('CLIENT_ID')
+CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+
 #this one is just for heroku
 def create_app():
     global app
@@ -45,12 +49,13 @@ def create_room(roomcode,tokens):
 ### SPOTIFY ###
 
 def get_api_token(authCode):
+    global REDIR_URI, CLIENT_ID, CLIENT_SECRET
     params = {
-        'client_id': 'cb6e434f986247b7be00bba2ec03e9c0',
-        'client_secret': 'c97a16c6d67f42bd836dbb67630877ed',
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
         'grant_type': 'authorization_code',
         'code': authCode,
-        'redirect_uri': 'http://localhost:5000/create/actual'
+        'redirect_uri': REDIR_URI
     }
 
     url = 'https://accounts.spotify.com/api/token'
