@@ -111,8 +111,8 @@ class Player extends Component {
             </div>
             <div class="flex justify-between px-3 sm:px-10 py-4">
             <button onClick=${this.playpause} class="underline">${this.state.playing? 'pause' : 'play'}</button>
-            <div>
-            ${this.state.spotifyData ? this.state.spotifyData.item.name : '...' }
+            <div class="flex-grow text-center">
+            ${this.state.spotifyData ? this.state.spotifyData.item.name : '...' } — ${this.state.spotifyData ? this.state.spotifyData.item.artists[0].name : '...'}
             </div>
             <button onClick=${this.skip} class="underline">skip</button>
             </div>
