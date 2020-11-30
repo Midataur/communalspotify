@@ -20,7 +20,7 @@ class Player extends Component {
         super();
         this.state = {
             playing:false,
-            colourProfile: "DarkMuted"
+            colourProfile: "Vibrant"
         } 
         
         console.log(this.state)
@@ -67,7 +67,7 @@ class Player extends Component {
             return `
                 --page-bg-h:${currentPalette[0]*360};
                 --page-bg-s:${currentPalette[1]*100};
-                --page-bg-l:${currentPalette[2]*100};
+                --page-bg-l:${(currentPalette[2]*100) >= 60 ? (currentPalette[2]*100)-15 : (currentPalette[2]*100)};
             `
         })
         
