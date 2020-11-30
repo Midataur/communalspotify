@@ -46,6 +46,7 @@ class Player extends Component {
             socket.emit('playpause', '{{roomcode}}');
             console.log('sent playpause');
             ev.preventDefault();
+            this.fetchData()
             this.setState({playing:!this.state.playing})
         })
         
