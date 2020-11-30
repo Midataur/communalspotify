@@ -18,6 +18,7 @@ class Player extends Component {
         super();
         this.state = {
             playing:false,
+            colourProfile: "DarkMuted"
         } 
         
         console.log(this.state)
@@ -87,9 +88,8 @@ class Player extends Component {
             
             <style>
             :root{
-                ${this.state.palette ? this.getCSSPaletteVars("DarkMuted") : ''}
+                ${this.state.palette ? this.getCSSPaletteVars(this.state.colourProfile) : ''}
             }
-            
             </style>
             <div class="px-2 sm:px-8">
                 <div class="relative aspect-ratio-square rounded-lg">
