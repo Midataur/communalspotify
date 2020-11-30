@@ -6,6 +6,8 @@
 {%endblock%}
 {%block code %}
 
+{{component_import("PaletteIndicator")}}
+
 let socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function() {
     socket.emit('room_connect','{{roomcode}}');
@@ -91,6 +93,7 @@ class Player extends Component {
                 ${this.state.palette ? this.getCSSPaletteVars(this.state.colourProfile) : ''}
             }
             </style>
+            <${PaletteIndicator} paletteStr=${this.state.palette ? JSON.stringify(this.state.palette) : false} profileInUse=${this.state.colourProfile} />
             <div class="px-2 sm:px-8">
                 <div class="relative aspect-ratio-square rounded-lg">
                     <!--<img 
