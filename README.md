@@ -259,7 +259,7 @@ $ npm run tcss:prod
 
 > note: i've only tested this with bash. If you have problems with the npm script, basically just run `npm run tcss:dev` with the `NODE_ENV` environmental variable set to `production`. (although, i am using cross-env, so it should work)
 
-PurgeCSS will look for tailwindcss classes in both `.html` and `.js` files inside of the `./templates` dir. [**Don't use string concatenation to create class names. Instead dynamically select a complete class name**](https://tailwindcss.com/docs/controlling-file-size#writing-purgeable-html)
+PurgeCSS will look for tailwindcss classes in both `.html` and `.js` files inside of the `./templates` dir. And will look in `.js` files inside `./components`. [**Don't use string concatenation to create class names. Instead dynamically select a complete class name**](https://tailwindcss.com/docs/controlling-file-size#writing-purgeable-html)
 
 You shouldn't ever build tailwind for production on your machine. It should be built into the production version when being uploaded to the server. (so, you can run `tcss:prod` as a build step basically)
 
