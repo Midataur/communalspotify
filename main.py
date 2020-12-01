@@ -25,8 +25,10 @@ def create_app():
 
 def redis_instance():
     global REDIS_URL
-    #this wrapper exists for future proofing
-    return redis.Redis(host=REDIS_URL)
+    if REDIS_URL:
+        return redis.from_url(REDIS_URL)
+    else:
+        return redis.Redis()
 
 def generate_roomcode():
     r = redis_instance()
