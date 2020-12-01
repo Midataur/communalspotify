@@ -16,6 +16,7 @@ socketio = SocketIO(app)
 REDIR_URI = os.environ.get('REDIRECT_URI')
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
+REDIS_URL = os.environ.get('REDIS_URL')
 
 #this one is just for heroku
 def create_app():
@@ -23,8 +24,9 @@ def create_app():
     return app
 
 def redis_instance():
+    global REDIS_URL
     #this wrapper exists for future proofing
-    return redis.Redis()
+    return redis.Redis(host=REDIS_URL)
 
 def generate_roomcode():
     r = redis_instance()
@@ -62,6 +64,8 @@ def get_api_token(authCode):
 
     response = requests.post(url, data=params).json()
 
+    print(response)
+
     print('Expires in',response['expires_in'])
 
     return response['access_token'],response['refresh_token']
@@ -76,6 +80,7 @@ def play_state(code):
     resp = requests.get(url, headers=headers)
     print(resp.content)
     return resp.json()
+
 ## API ROUTES
 
 #this is a forwarder to the Spotify api so we don't give the authtokens to every client
