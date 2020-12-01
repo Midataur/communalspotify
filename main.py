@@ -80,7 +80,7 @@ def play_state(code):
     url = 'https://api.spotify.com/v1/me/player'
 
     resp = requests.get(url, headers=headers)
-    print(resp.content)
+
     return resp.json()
 
 ## API ROUTES
@@ -101,6 +101,23 @@ def spotify_search():
     url = 'https://api.spotify.com/v1/search'
 
     return requests.get(url, headers=headers, params=params).json()
+
+@app.route('/api/queue')
+def queue_song():
+    params = {
+        'uri': request.args['uri']
+    }
+    
+    code = request.args['roomcode']
+    r = redis_instance()
+    token = r.hget(code,'access_token').decode('utf-8')
+
+    headers = {'Authorization': f'Bearer {token}'}
+    url = 'https://api.spotify.com/v1/me/player/queue'
+
+    resp = requests.post(url, headers=headers, params=params)
+
+    return str(resp.status_code)
 
 @app.route('/api/getPlayState')
 def get_play_state():
