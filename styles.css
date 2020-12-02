@@ -3,3 +3,14 @@
 @tailwind components;
 
 @tailwind utilities;
+
+@layer components {
+  .text-body {
+      @apply text-xl;
+  }
+  @screen sm {
+      .text-body {
+          @apply text-2xl
+      }
+  }
+}
