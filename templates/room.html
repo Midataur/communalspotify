@@ -59,15 +59,15 @@ class Player extends Component {
             setTimeout(() => {  this.fetchData() }, 1000);
         })
         
-        _defineProperty(this, "getCSSPaletteVars", (profile="Vibrant") => {
+        _defineProperty(this, "getCSSPaletteVars", (profile="Vibrant", varName="page-bg") => {
             let currentPalette = this.state.palette[profile]._hsl ? 
             this.state.palette[profile]._hsl : 
             RGBtoHSL(this.state.palette[profile]._rgb[0], this.state.palette[profile]._rgb[1], this.state.palette[profile]._rgb[2])     
             
             return `
-                --page-bg-h:${currentPalette[0]*360};
-                --page-bg-s:${currentPalette[1]*100};
-                --page-bg-l:${(currentPalette[2]*100) >= 60 ? (currentPalette[2]*100)-15 : (currentPalette[2]*100)};
+                --${varName}-h:${currentPalette[0]*360};
+                --${varName}-s:${currentPalette[1]*100};
+                --${varName}-l:${(currentPalette[2]*100)};
             `
         })
         
