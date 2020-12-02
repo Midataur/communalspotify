@@ -1,7 +1,9 @@
 from flask import Flask, request, url_for, render_template, make_response, Markup
 from flask_socketio import SocketIO, join_room, leave_room
 from collections import defaultdict
+from apscheduler.schedulers.background import BackgroundScheduler
 import xml.sax.saxutils as saxutils
+import time
 import hashlib
 import json
 import random
@@ -17,6 +19,8 @@ REDIR_URI = os.environ.get('REDIRECT_URI')
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 REDIS_URL = os.environ.get('REDIS_URL')
+
+ALLOWED_IDLE_TIME = 60*60*3 #measured in seconds
 
 #this one is just for heroku
 def create_app():
@@ -49,6 +53,22 @@ def create_room(roomcode,tokens):
     }
     r.delete(roomcode)
     r.hset(roomcode,mapping=data)
+
+### SCHEDULED WORKERS ###
+
+def clean_idle_rooms():
+    global ALLOWED_IDLE_TIME
+    r = redis_instance()
+    for key in r.scan_iter("*"):
+        idle = r.object("idletime", key)
+        # idle time is in seconds
+        if idle > ALLOWED_IDLE_TIME:
+            r.delete(key)
+    print('cleaned out old rooms')
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=clean_idle_rooms, trigger="interval", seconds=ALLOWED_IDLE_TIME)
+scheduler.start()
 
 ### SPOTIFY ###
 
@@ -255,6 +275,5 @@ def component_processor():
 if __name__ == '__main__':
     @app.route('/debug')
     def debug():
-        global classrooms
         0/0
     socketio.run(create_app(),host='0.0.0.0')

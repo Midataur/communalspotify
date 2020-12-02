@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5aa0fddd32ca49318f2e2fd53f9f958eb8cc0fa75db12803635bfe36c83a453f"
+            "sha256": "e60ee2f9a2f852a5abbbf079e1f421a6bb40f91bb0cedbaa51a7b0f3a19d9180"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,14 @@
         ]
     },
     "default": {
+        "apscheduler": {
+            "hashes": [
+                "sha256:3bb5229eed6fbbdafc13ce962712ae66e175aa214c69bed35a06bffcf0c5e244",
+                "sha256:e8b1ecdb4c7cb2818913f766d5898183c7cb8936680710a4d3a966e02262e526"
+            ],
+            "index": "pypi",
+            "version": "==3.6.3"
+        },
         "certifi": {
             "hashes": [
                 "sha256:1f422849db327d534e3d0c5f02a263458c3955ec0aae4ff09b95f195c59f4edd",
@@ -183,6 +191,13 @@
             "index": "pypi",
             "version": "==4.6.1"
         },
+        "pytz": {
+            "hashes": [
+                "sha256:3e6b7dd2d1e0a59084bcee14a17af60c5c562cdc16d828e8eba2e683d3a7e268",
+                "sha256:5c55e189b682d420be27c6995ba6edce0c0a77dd67bfbe2ae6607134d5851ffd"
+            ],
+            "version": "==2020.4"
+        },
         "redis": {
             "hashes": [
                 "sha256:0e7e0cfca8660dea8b7d5cd8c4f6c5e29e11f31158c0b0ae91a397f00e5a05a2",
@@ -206,6 +221,13 @@
             ],
             "index": "pypi",
             "version": "==1.15.0"
+        },
+        "tzlocal": {
+            "hashes": [
+                "sha256:643c97c5294aedc737780a49d9df30889321cbe1204eac2c2ec6134035a92e44",
+                "sha256:e2cb6c6b5b604af38597403e9852872d7f534962ae2954c7f35efcb1ccacf4a4"
+            ],
+            "version": "==2.1"
         },
         "urllib3": {
             "hashes": [
