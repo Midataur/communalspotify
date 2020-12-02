@@ -212,7 +212,22 @@ def join():
 @app.route('/room')
 def room():
     roomcode = request.cookies['roomCode']
-    return render_template('room.html',roomcode=roomcode)
+
+    admin = False
+    if 'authCode' in request.cookies:
+        r = redis_instance()
+        roomcode = request.cookies['roomCode']
+        authCode = r.hget(roomcode,'access_token').decode('utf-8')
+        if authCode == request.cookies['authCode']:
+            admin = True
+
+    resp = make_response(render_template('room.html',roomcode=roomcode, admin=admin))
+
+    if 'id' not in request.cookies:
+        unique_id = hex(random.randint(10**10,10**11))
+        resp.set_cookie('id',unique_id)
+
+    return resp
 
 @app.errorhandler(404)
 def page_not_found(e):
