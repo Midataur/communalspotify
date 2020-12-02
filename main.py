@@ -125,7 +125,9 @@ def queue_song(code, uri):
 def spotify_search():
     params = {
         'type': 'track',
-        'q': request.args['q']
+        'q': request.args['q'],
+        'market': 'from_token',
+        'limit': request.args['limit']
     }
     
     code = request.args['roomcode']

@@ -9,7 +9,7 @@
         'client_id': '{{client_id}}',
         'response_type': 'code',
         'redirect_uri': '{{redir_uri}}',
-        'scope': 'streaming app-remote-control user-read-playback-state user-modify-playback-state user-read-currently-playing user-read-playback-position',
+        'scope': 'streaming app-remote-control user-read-playback-state user-modify-playback-state user-read-currently-playing user-read-playback-position user-read-private',
         'show_dialog': true
     };
     var url = 'https://accounts.spotify.com/authorize?'+jQuery.param(query_params);
