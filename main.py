@@ -49,7 +49,7 @@ def create_room(roomcode,tokens):
     r = redis_instance()
     data = {
         'access_token': tokens[0],
-        'refresh_token': tokens[1]
+        'refresh_token': tokens[1],
     }
     r.delete(roomcode)
     r.hset(roomcode,mapping=data)
@@ -103,6 +103,21 @@ def play_state(code):
 
     return resp.json()
 
+def queue_song(code, uri):
+    params = {
+        'uri': uri
+    }
+    
+    r = redis_instance()
+    token = r.hget(code,'access_token').decode('utf-8')
+
+    headers = {'Authorization': f'Bearer {token}'}
+    url = 'https://api.spotify.com/v1/me/player/queue'
+
+    resp = requests.post(url, headers=headers, params=params)
+
+    return str(resp.status_code)
+
 ## API ROUTES
 
 #this is a forwarder to the Spotify api so we don't give the authtokens to every client
@@ -121,23 +136,6 @@ def spotify_search():
     url = 'https://api.spotify.com/v1/search'
 
     return requests.get(url, headers=headers, params=params).json()
-
-@app.route('/api/queue')
-def queue_song():
-    params = {
-        'uri': request.args['uri']
-    }
-    
-    code = request.args['roomcode']
-    r = redis_instance()
-    token = r.hget(code,'access_token').decode('utf-8')
-
-    headers = {'Authorization': f'Bearer {token}'}
-    url = 'https://api.spotify.com/v1/me/player/queue'
-
-    resp = requests.post(url, headers=headers, params=params)
-
-    return str(resp.status_code)
 
 @app.route('/api/getPlayState')
 def get_play_state():
@@ -170,6 +168,12 @@ def skip(code):
     headers = {'Authorization': f'Bearer {token}'}
     url = f'https://api.spotify.com/v1/me/player/next'
     requests.post(url,headers=headers)
+
+@socketio.on('vote'):
+def vote(code, uri, sign):
+    #sign is +1 for upvote and -1 for downvote
+    r = redis_instance()
+    r.zincrby(str(code)+'q', sign, uri)
 
 ### ROUTES ###
 
