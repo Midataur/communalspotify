@@ -169,7 +169,7 @@ def skip(code):
     url = f'https://api.spotify.com/v1/me/player/next'
     requests.post(url,headers=headers)
 
-@socketio.on('vote'):
+@socketio.on('vote')
 def vote(code, uri, sign):
     #sign is +1 for upvote and -1 for downvote
     r = redis_instance()
