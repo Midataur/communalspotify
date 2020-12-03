@@ -13,7 +13,8 @@ socket.on('connect', function() {
     socket.emit('room_connect','{{roomcode}}');
 });
 
-const roomCode = "{{roomcode}}"
+const roomCode = "{{roomcode}}";
+const uid = "{{uid}}"
 
 class Player extends Component {
     constructor() {
@@ -33,7 +34,7 @@ class Player extends Component {
         })
         
         _defineProperty(this, "fetchData", (ev) => {
-            fetch(`/api/getPlayState?roomcode=${roomCode}`)
+            fetch(`/api/getPlayState?roomcode=${roomCode}&uid=${uid}`)
               .then(r => r.json())
               .catch(() => {error:"fetching play state failed"})
               .then(data => this.setState({

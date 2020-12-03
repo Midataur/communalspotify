@@ -1,10 +1,8 @@
 from flask import Flask, request, url_for, render_template, make_response, Markup
 from flask_socketio import SocketIO, join_room, leave_room
-from collections import defaultdict
 from apscheduler.schedulers.background import BackgroundScheduler
-import xml.sax.saxutils as saxutils
+from non_routes import *
 import time
-import hashlib
 import json
 import random
 import redis
@@ -15,15 +13,8 @@ app = Flask(__name__)
 app.config['DEBUG'] = True if __name__ == '__main__' else False
 socketio = SocketIO(app)
 
-REDIR_URI = os.environ.get('REDIRECT_URI')
-CLIENT_ID = os.environ.get('CLIENT_ID')
-CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
-REDIS_URL = os.environ.get('REDIS_URL')
-
 scheduler = BackgroundScheduler()
 scheduler.start()
-
-ALLOWED_IDLE_TIME = 60*60*3 #measured in seconds
 
 #this one is just for heroku
 def create_app():
@@ -32,135 +23,6 @@ def create_app():
 
 #all these functions should reallly be in a seperate file 
 #eh, i'll do it later -mida
-
-def redis_instance():
-    global REDIS_URL
-    if REDIS_URL:
-        return redis.from_url(REDIS_URL)
-    else:
-        return redis.Redis()
-
-def generate_roomcode():
-    r = redis_instance()
-    lower = 10**5
-    upper = 10**6
-    while True:
-        code = str(random.randint(lower,upper))
-        if not r.exists(code):
-            r.set(code,'taken',ex=20)
-            return code
-        upper *= 10
-
-def create_room(roomcode,auth_result):
-    global scheduler
-
-    r = redis_instance()
-    data = {
-        'access_token': auth_result[0],
-        'refresh_token': auth_result[1],
-    }
-
-    r.delete(roomcode)
-    r.hset(roomcode,mapping=data)
-
-    renewer = scheduler.add_job(
-        func=room_checkup, 
-        trigger="interval", 
-        seconds=auth_result[2], 
-        args=(roomcode,)
-    )
-
-    #remember the id of this job so we can delete it later
-    r.hset(roomcode, 'job_id', renewer.id)
-
-### SCHEDULED WORKERS ###
-
-def room_checkup(roomcode):
-    global ALLOWED_IDLE_TIME, scheduler
-    r = redis_instance()
-
-    #first, check if we should kill the room
-    queue_key = roomcode+'q'
-    idle_time = r.object("idletime", queue_key)
-
-    # idle time is in seconds
-    if not idle_time or idle_time > ALLOWED_IDLE_TIME:
-        job_id = r.hget(roomcode, 'job_id')
-
-        r.delete(roomcode)
-        r.delete(queue_key)
-
-        #seppuku
-        print('goodbye room',roomcode)
-        scheduler.remove_job('job_id')
-
-    else:
-        renew_token(roomcode)
-
-    print('room checkup done on', roomcode)
-
-### SPOTIFY ###
-
-def get_api_token(authCode):
-    global REDIR_URI, CLIENT_ID, CLIENT_SECRET
-    params = {
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'grant_type': 'authorization_code',
-        'code': authCode,
-        'redirect_uri': REDIR_URI
-    }
-
-    url = 'https://accounts.spotify.com/api/token'
-
-    response = requests.post(url, data=params).json()
-
-    return response['access_token'],response['refresh_token'],response['expires_in']
-
-def renew_token(roomcode):
-    global CLIENT_ID, CLIENT_SECRET
-
-    r = redis_instance()
-    refresh_token = r.hget(roomcode,'access_token').decode('utf-8')
-
-    params = {
-        'grant_type': 'refresh_token',
-        'refresh_token': refresh_token
-    }
-
-    url = 'https://accounts.spotify.com/api/token'
-
-    headers = {'Authorization': f'Basic {CLIENT_ID}:{CLIENT_SECRET}'}
-    response = requests.post(url, data=params, headers=headers).json()
-
-    r.hset(roomcode,'access_token', response['access_token'])
-
-def play_state(code):
-    r = redis_instance()
-    
-    token = r.hget(code,'access_token').decode('utf-8')
-
-    headers = {'Authorization': f'Bearer {token}'}
-    url = 'https://api.spotify.com/v1/me/player'
-
-    resp = requests.get(url, headers=headers)
-
-    return resp.json()
-
-def queue_song(code, uri):
-    params = {
-        'uri': uri
-    }
-    
-    r = redis_instance()
-    token = r.hget(code,'access_token').decode('utf-8')
-
-    headers = {'Authorization': f'Bearer {token}'}
-    url = 'https://api.spotify.com/v1/me/player/queue'
-
-    resp = requests.post(url, headers=headers, params=params)
-
-    return str(resp.status_code)
 
 ## API ROUTES
 
@@ -185,7 +47,14 @@ def spotify_search():
 
 @app.route('/api/getPlayState')
 def get_play_state():
-    return play_state(request.args['roomcode'])
+    roomcode = request.args['roomcode']
+    uid = request.args['uid']
+
+    #we use this as a convenient way to track active users
+    r = redis_instance()
+    r.sadd(roomcode+'p', uid)
+
+    return play_state(roomcode)
 
 ### SOCKETS ###
 
@@ -206,17 +75,13 @@ def playpause(code):
     url = f'https://api.spotify.com/v1/me/player/{status}'
     requests.put(url,headers=headers)
 
-@socketio.on('skip')
-def skip(code):
+@socketio.on('vote-skip')
+def vote_skip(code, id):
     r = redis_instance()
-    token = r.hget(str(code),'access_token').decode('utf-8')
+    pass
 
-    headers = {'Authorization': f'Bearer {token}'}
-    url = f'https://api.spotify.com/v1/me/player/next'
-    requests.post(url,headers=headers)
-
-@socketio.on('vote')
-def vote(code, uri, sign):
+@socketio.on('vote-song')
+def vote_song(code, uri, sign):
     #sign is +1 for upvote and -1 for downvote
     r = redis_instance()
     r.zincrby(str(code)+'q', sign, uri)
