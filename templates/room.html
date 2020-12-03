@@ -39,7 +39,7 @@ class Player extends Component {
               }))
               .then(()=> this.getColours(this.state.spotifyData.item.album.images[0].url))
               .then((palette) => this.setState({palette}))
-              .then(()=>console.log(this.state))
+              //.then(()=>console.log(this.state))
               
         })
         
