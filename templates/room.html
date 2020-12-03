@@ -92,7 +92,7 @@ class Player extends Component {
             }
             </style>
             <${PaletteIndicator} paletteStr=${this.state.palette ? JSON.stringify(this.state.palette) : false} profileInUse=${this.state.colourProfile} />
-            <div class="px-2 sm:px-8">
+            <div class="">
                 <div class="relative aspect-ratio-square rounded-lg">
                     <!--<img 
                         src="${this.state.spotifyData ? this.state.spotifyData.item.album.images[0].url : '' }"
@@ -127,7 +127,9 @@ const Room = () => {
             <span class="bg-page-contrast text-page-bg px-1 ml-2">${roomCode}</span>
         </div>
     <//>
+    <div class="px-2 sm:px-8">
     <${Player}/>
+    </div>
     ` 
 }
 
