@@ -44,7 +44,7 @@ class Player extends Component {
         })
         
         _defineProperty(this, "playpause", (ev) => {
-            socket.emit('playpause', '{{roomcode}}');
+            socket.emit('playpause', roomCode);
             console.log('sent playpause');
             ev.preventDefault();
             this.fetchData()
@@ -52,7 +52,7 @@ class Player extends Component {
         })
         
         _defineProperty(this, "skip", (ev) => {
-            socket.emit('skip', '{{roomcode}}');
+            socket.emit('skip', roomCode);
             console.log('sent skip');
             setTimeout(() => {  this.fetchData() }, 1000);
         })
