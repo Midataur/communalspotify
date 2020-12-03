@@ -13,6 +13,12 @@ socket.on('connect', function() {
     socket.emit('room_connect','{{roomcode}}');
 });
 
+socket.on('skip_progress', function( data ) {
+    let skippers = data[0];
+    let needed = data[1];
+    console.log(skippers+' out of '+needed+' have skipped');
+});
+
 const roomCode = "{{roomcode}}";
 const uid = "{{uid}}"
 
@@ -47,7 +53,7 @@ class Player extends Component {
         })
         
         _defineProperty(this, "playpause", (ev) => {
-            socket.emit('playpause', '{{roomcode}}');
+            socket.emit('playpause', roomCode);
             console.log('sent playpause');
             ev.preventDefault();
             this.fetchData()
@@ -55,7 +61,7 @@ class Player extends Component {
         })
         
         _defineProperty(this, "skip", (ev) => {
-            socket.emit('skip', '{{roomcode}}');
+            socket.emit('vote-skip', roomCode, uid);
             console.log('sent skip');
             setTimeout(() => {  this.fetchData() }, 1000);
         })

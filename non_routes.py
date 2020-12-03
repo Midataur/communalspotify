@@ -1,3 +1,4 @@
+from apscheduler.schedulers.background import BackgroundScheduler
 import time
 import json
 import random
@@ -13,6 +14,9 @@ REDIS_URL = os.environ.get('REDIS_URL')
 
 #constants
 ALLOWED_IDLE_TIME = 60*60*3 #measured in seconds
+
+scheduler = BackgroundScheduler()
+scheduler.start()
 
 def redis_instance():
     global REDIS_URL
