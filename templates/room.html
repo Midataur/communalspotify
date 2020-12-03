@@ -6,7 +6,7 @@
 {%endblock%}
 {%block code %}
 
-{{component_import("PaletteIndicator")}}
+{{component_import("PaletteIndicator", "Search")}}
 
 let socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function() {
@@ -120,6 +120,7 @@ class Player extends Component {
 }
 
 const Room = () => {
+    
     return html`
     <${SlotContent} name="headerNav">
         <div>
@@ -129,6 +130,7 @@ const Room = () => {
     <//>
     <div class="px-2 sm:px-8">
     <${Player}/>
+    <${Search}/>
     </div>
     ` 
 }
