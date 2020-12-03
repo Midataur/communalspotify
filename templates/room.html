@@ -13,18 +13,13 @@ socket.on('connect', function() {
     socket.emit('room_connect','{{roomcode}}');
 });
 
-<<<<<<< HEAD
 socket.on('skip_progress', function( data ) {
     let skippers = data[0];
     let needed = data[1];
     console.log(skippers+' out of '+needed+' have skipped');
 });
 
-const roomCode = "{{roomcode}}";
-const uid = "{{uid}}"
 
-=======
->>>>>>> db3103d7bde6e04eaf593c57576549cd775423ba
 class Player extends Component {
     constructor() {
         super();
@@ -64,11 +59,7 @@ class Player extends Component {
         })
         
         _defineProperty(this, "skip", (ev) => {
-<<<<<<< HEAD
             socket.emit('vote-skip', roomCode, uid);
-=======
-            socket.emit('skip', roomCode);
->>>>>>> db3103d7bde6e04eaf593c57576549cd775423ba
             console.log('sent skip');
             setTimeout(() => {  this.fetchData() }, 1000);
         })
