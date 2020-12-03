@@ -20,12 +20,18 @@ CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET = os.environ.get('CLIENT_SECRET')
 REDIS_URL = os.environ.get('REDIS_URL')
 
+scheduler = BackgroundScheduler()
+scheduler.start()
+
 ALLOWED_IDLE_TIME = 60*60*3 #measured in seconds
 
 #this one is just for heroku
 def create_app():
     global app
     return app
+
+#all these functions should reallly be in a seperate file 
+#eh, i'll do it later -mida
 
 def redis_instance():
     global REDIS_URL
@@ -45,30 +51,53 @@ def generate_roomcode():
             return code
         upper *= 10
 
-def create_room(roomcode,tokens):
+def create_room(roomcode,auth_result):
+    global scheduler
+
     r = redis_instance()
     data = {
-        'access_token': tokens[0],
-        'refresh_token': tokens[1],
+        'access_token': auth_result[0],
+        'refresh_token': auth_result[1],
     }
+
     r.delete(roomcode)
     r.hset(roomcode,mapping=data)
 
+    renewer = scheduler.add_job(
+        func=room_checkup, 
+        trigger="interval", 
+        seconds=auth_result[2], 
+        args=(roomcode,)
+    )
+
+    #remember the id of this job so we can delete it later
+    r.hset(roomcode, 'job_id', renewer.id)
+
 ### SCHEDULED WORKERS ###
 
-def clean_idle_rooms():
-    global ALLOWED_IDLE_TIME
+def room_checkup(roomcode):
+    global ALLOWED_IDLE_TIME, scheduler
     r = redis_instance()
-    for key in r.scan_iter("*"):
-        idle = r.object("idletime", key)
-        # idle time is in seconds
-        if idle > ALLOWED_IDLE_TIME:
-            r.delete(key)
-    print('cleaned out old rooms')
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=clean_idle_rooms, trigger="interval", seconds=ALLOWED_IDLE_TIME)
-scheduler.start()
+    #first, check if we should kill the room
+    queue_key = roomcode+'q'
+    idle_time = r.object("idletime", queue_key)
+
+    # idle time is in seconds
+    if not idle_time or idle_time > ALLOWED_IDLE_TIME:
+        job_id = r.hget(roomcode, 'job_id')
+
+        r.delete(roomcode)
+        r.delete(queue_key)
+
+        #seppuku
+        print('goodbye room',roomcode)
+        scheduler.remove_job('job_id')
+
+    else:
+        renew_token(roomcode)
+
+    print('room checkup done on', roomcode)
 
 ### SPOTIFY ###
 
@@ -86,14 +115,29 @@ def get_api_token(authCode):
 
     response = requests.post(url, data=params).json()
 
-    print(response)
+    return response['access_token'],response['refresh_token'],response['expires_in']
 
-    print('Expires in',response['expires_in'])
+def renew_token(roomcode):
+    global CLIENT_ID, CLIENT_SECRET
 
-    return response['access_token'],response['refresh_token']
+    r = redis_instance()
+    refresh_token = r.hget(roomcode,'access_token').decode('utf-8')
+
+    params = {
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token
+    }
+
+    url = 'https://accounts.spotify.com/api/token'
+
+    headers = {'Authorization': f'Basic {CLIENT_ID}:{CLIENT_SECRET}'}
+    response = requests.post(url, data=params, headers=headers).json()
+
+    r.hset(roomcode,'access_token', response['access_token'])
 
 def play_state(code):
     r = redis_instance()
+    
     token = r.hget(code,'access_token').decode('utf-8')
 
     headers = {'Authorization': f'Bearer {token}'}
@@ -192,9 +236,10 @@ def debug_view():
 @app.route('/create')
 def create_user_facing():
     global CLIENT_ID, REDIR_URI
+
+    #if user already made a room log them into that one
     if 'roomCode' in request.cookies and 'authCode' in request.cookies:
         try:
-            print('Trying easy log')
             r = redis_instance()
             roomcode = request.cookies['roomCode']
             authCode = r.hget(roomcode,'access_token').decode('utf-8')
@@ -202,14 +247,15 @@ def create_user_facing():
                 return '<script>window.location = "/room"</script>'
         except AttributeError:
             pass
+    
     return render_template('create.html',client_id=CLIENT_ID,redir_uri=REDIR_URI)
 
 @app.route('/create/actual')
 def actual_create():
     if 'code' in request.args:
-        tokens = get_api_token(request.args['code'])
+        auth_result = get_api_token(request.args['code'])
         roomcode = generate_roomcode()
-        create_room(roomcode,tokens)
+        create_room(roomcode,auth_result)
 
         r = redis_instance()
         authCode = r.hget(roomcode,'access_token')
