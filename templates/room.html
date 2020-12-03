@@ -119,9 +119,8 @@ class Player extends Component {
     }
 }
 
-
-
-Main = () => (html`
+const Room = () => {
+    return html`
     <${SlotContent} name="headerNav">
         <div>
             Room Code: 
@@ -129,8 +128,11 @@ Main = () => (html`
         </div>
     <//>
     <${Player}/>
+    ` 
+}
 
-    
+Main = () => (html`
+    <${Room} />   
 `) 
 
 {%endblock%}
