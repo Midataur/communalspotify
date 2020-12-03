@@ -13,20 +13,14 @@ app = Flask(__name__)
 app.config['DEBUG'] = True if __name__ == '__main__' else False
 socketio = SocketIO(app)
 
-scheduler = BackgroundScheduler()
-scheduler.start()
-
 #this one is just for heroku
 def create_app():
     global app
     return app
 
-#all these functions should reallly be in a seperate file 
-#eh, i'll do it later -mida
-
 ## API ROUTES
+#these are just forwarders to the Spotify api so we don't give the authtokens to every client
 
-#this is a forwarder to the Spotify api so we don't give the authtokens to every client
 @app.route('/api/search')
 def spotify_search():
     params = {
@@ -50,7 +44,7 @@ def get_play_state():
     roomcode = request.args['roomcode']
     uid = request.args['uid']
 
-    #we use this as a convenient way to track active users
+    #we use this as a convenient way to track total active users
     r = redis_instance()
     r.sadd(roomcode+'p', uid)
 
@@ -76,27 +70,32 @@ def playpause(code):
     requests.put(url,headers=headers)
 
 @socketio.on('vote-skip')
-def vote_skip(code, id):
+def vote_skip(code, uid):
     r = redis_instance()
-    pass
+    r.sadd(code+'s', uid)
+
+    skippers = r.scard(code+'s')
+    total = r.scard(code+'p')
+
+    if skippers >= total//2:
+        skip_song(code)
+        r.delete(code+'s')
+    
+    socketio.emit('skip_progress', [skippers, total//2], room=code, broadcast=True)
 
 @socketio.on('vote-song')
 def vote_song(code, uri, sign):
     #sign is +1 for upvote and -1 for downvote
     r = redis_instance()
-    r.zincrby(str(code)+'q', sign, uri)
+    #little bit of server side security
+    if abs(sign) >= 1:
+        r.zincrby(str(code)+'q', sign, uri)
 
 ### ROUTES ###
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-# i should prolly figure out a way to hide this route when published.
-@app.route('/debug')
-def debug_view():
-    return render_template('debug.html')
-
 
 @app.route('/create')
 def create_user_facing():
@@ -158,11 +157,13 @@ def room():
         if authCode == request.cookies['authCode']:
             admin = True
 
-    resp = make_response(render_template('room.html',roomcode=roomcode, admin=admin))
-
     if 'id' not in request.cookies:
-        unique_id = hex(random.randint(10**10,10**11))
-        resp.set_cookie('id',unique_id)
+        uid = hex(random.randint(10**10,10**11))
+    else:
+        uid = request.cookies['id']
+    
+    resp = make_response(render_template('room.html', roomcode=roomcode, admin=admin, uid=uid))
+    resp.set_cookie('id', uid)
 
     return resp
 
