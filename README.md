@@ -1,6 +1,18 @@
 # communalspotify
 A webapp for democratizing music in public spaces
 
+## Contents
+- [Changelog](#changelog)
+- [Debug options](#debug-options)
+- [Preact and javascript](#preact-and-javascript)
+	- [the _defineproperty function](#_defineproperty)
+- [Preact Components](#preact-components)
+- [Slots](#slots)
+- Tailwind
+	- [Building Tailwind for dev](#building-tailwindcss-for-dev)
+	- [Building Tailwind for production](#to-build-tailwind-for-production)
+
+
 ## Changelog
 just do git commits with this template:
 ```
