@@ -156,3 +156,36 @@ def skip_song(code):
     headers = {'Authorization': f'Bearer {token}'}
     url = f'https://api.spotify.com/v1/me/player/next'
     requests.post(url,headers=headers)
+
+def get_tracks_info(uris, roomcode):
+    #chop off the resource type to get the spotify ids
+    spot_ids = [x[14:].decode('utf-8') for x in uris]
+
+    r = redis_instance()
+    token = r.hget(str(roomcode),'access_token').decode('utf-8')
+
+    params = {
+        'ids': ','.join(spot_ids)
+    }
+
+    headers = {'Authorization': f'Bearer {token}'}
+    url = f'https://api.spotify.com/v1/tracks'
+
+    resp = requests.get(url,params=params, headers=headers).json()
+    return resp['tracks']
+
+def proccess_tracks(tracks):
+
+    new_tracks = []
+
+    for track, score in tracks:
+        data = {
+            'score': score,
+            'image': track['album']['images'][0]['url'],
+            'uri': track['uri'],
+            'name': track['name'],
+            'artist': track['artists'][0]['name']
+        }
+        new_tracks.append(data)
+    
+    return new_tracks

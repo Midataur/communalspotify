@@ -1,4 +1,4 @@
-from flask import Flask, request, url_for, render_template, make_response, Markup
+from flask import Flask, request, url_for, render_template, make_response, Markup, Response
 from flask_socketio import SocketIO, join_room, leave_room
 from apscheduler.schedulers.background import BackgroundScheduler
 from non_routes import *
@@ -19,7 +19,7 @@ def create_app():
     return app
 
 ## API ROUTES
-#these are just forwarders to the Spotify api so we don't give the authtokens to every client
+#these are mostly just forwarders to the Spotify api so we don't give the authtokens to every client
 
 @app.route('/api/search')
 def spotify_search():
@@ -49,6 +49,18 @@ def get_play_state():
     r.sadd(roomcode+'p', uid)
 
     return play_state(roomcode)
+
+@app.route('/api/getCurrentQueue')
+def get_current_queue():
+    roomcode = request.args['roomcode']
+
+    r = redis_instance()
+    queue = r.zrange(roomcode+'q', 0,-1, withscores=True)
+
+    tracks_info = get_tracks_info([x[0] for x in queue], roomcode)
+    tracks = proccess_tracks(zip(tracks_info,[x[1] for x in queue]))
+
+    return Response(json.dumps(tracks), mimetype='application/json')
 
 ### SOCKETS ###
 
@@ -90,6 +102,11 @@ def vote_song(code, uri, sign):
     #little bit of server side security
     if abs(sign) >= 1:
         r.zincrby(str(code)+'q', sign, uri)
+
+#this is not a socket route but it does send a socket
+def queue_most_voted(roomcode):
+    r = redis_instance()
+    highest = r.zpopmax(roomcode+'q')
 
 ### ROUTES ###
 
