@@ -13,9 +13,6 @@ socket.on('connect', function() {
     socket.emit('room_connect','{{roomcode}}');
 });
 
-const roomCode = "{{roomcode}}";
-const uid = "{{uid}}"
-
 class Player extends Component {
     constructor() {
         super();
