@@ -90,9 +90,28 @@
 		{%block code %}
 		{%endblock%}
 		
+		function getPreviouslyVotedSongs() {
+			if (!localStorage.getItem("votedSongs")) return []
+			return JSON.parse(localStorage.getItem("votedSongs"))[roomCode]
+		}
+
+		function addVotedSong(uri){
+			const currentVotedSongs = getPreviouslyVotedSongs()
+			currentVotedSongs.push(uri)
+			localStorage.setItem('votedSongs', JSON.stringify({ [roomCode]: currentVotedSongs}));
+		}
 		
-
-
+		function voteSong(uri, roomcode, sign){
+			if (!localStorage.getItem("votedSongs")) localStorage.setItem("votedSongs",`{"${roomCode}": []}`)
+			if (!JSON.parse(localStorage.getItem("votedSongs"))[roomCode]) localStorage.setItem("votedSongs",`{"${roomCode}": []}`)
+			console.log("voteSong", localStorage.getItem("votedSongs"))
+			const currentVotedSongs = getPreviouslyVotedSongs()
+			if(!(currentVotedSongs.includes(uri))) {
+				socket.emit('vote-song', roomCode, uri, +1);
+				console.log("QueueItem", `voted for ${uri}`)
+				addVotedSong(uri)
+		  }
+		}
 		function App () {
 			return html`
 			<${SlotProvider}>

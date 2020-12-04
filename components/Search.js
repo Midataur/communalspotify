@@ -21,9 +21,8 @@ function Search() {
     const onSubmit = e => {
         fetch(`/api/search?q=${value}&roomcode=${roomCode}&limit=10`)
             .then(r => r.json())
-            .catch(() => {error:"fetching search results failed"})
             .then(data => setSearchResults(data.tracks))
-            .then(() => console.log(searchResults))
+            .catch(() => {error:"fetching search results failed"})
             
         console.log("component/Search", "Submitted form")
         e.preventDefault()
@@ -37,7 +36,7 @@ function Search() {
     const Options = () => {
         const addToQueue = e => {
             const songUri = e.target.dataset.songUri
-            socket.emit('vote-song', roomCode, songUri, +1);
+            voteSong( songUri, roomCode,  +1);
             closeSearchUI()
         }
         return searchResults.items.map((i) => {
@@ -54,6 +53,7 @@ function Search() {
     
     return (
         html`
+        <button onClick=${openSearchUI}>open search</button>
         <div class="h-full w-full fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-50 z-50 p-8 overflow-scroll">
             <div class="base mx-auto m-8">
               <div class="bg-white text-black p-8 py-10  w-full rounded-lg shadow-lg overflow-scroll relative">
