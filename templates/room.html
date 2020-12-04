@@ -14,22 +14,14 @@ socket.on('connect', function() {
 });
 
 
-socket.on('skip_progress', function( data ) {
-    let skippers = data[0];
-    let needed = data[1];
-    console.log(skippers+' out of '+needed+' have skipped');
-});
-
-socket.on('queue_change', function( ) {
-    console.log('queued song');
-});
-
 class Player extends Component {
     constructor() {
         super();
         this.state = {
             playing:false,
-            colourProfile: "DarkVibrant"
+            colourProfile: "DarkVibrant",
+            skippers:0,
+            needed:0,
         } 
         
         console.log(this.state)
@@ -60,7 +52,6 @@ class Player extends Component {
             console.log('sent playpause');
             ev.preventDefault();
             this.fetchData()
-            this.setState({playing:!this.state.playing})
             {% endif %}
         })
         
@@ -89,6 +80,25 @@ class Player extends Component {
         this.timer = setInterval(() => {
               this.fetchData()
         }, 15000); // probably should make this check only a couple of times
+        
+        socket.on('skip_progress', (data) => {
+            
+            this.setState({
+                skippers: data[0],
+                needed: Math.max(1, data[1])
+            })   
+            console.log("room/skip_progress socket", this.state)
+            setTimeout(() => {  this.setState({
+                skippers: 0,
+            }) }, 15000);
+        })
+        socket.on('song-change', () => {
+            this.setState({
+                skippers: 0,
+            })
+            console.log("room/song-change socket",this.state)
+        });
+        
     }
     componentWillUnmount() {
         // stop when not renderable
@@ -125,11 +135,9 @@ class Player extends Component {
             </div>
             <div class="flex items-center justify-center">
             {% if admin %}
-            <button onClick=${this.playpause} class="text-right underline">${this.state.playing? 'pause' : 'play'}</button>
-            <button onClick=${this.skip} class="underline ml-1">skip</button>
-            {% else %}
-            <button onClick=${this.skip} class="underline ">skip</button>
+            <button onClick=${this.playpause} class="text-right underline mr-1">play/pause</button>            
             {% endif %}
+            <button onClick=${this.skip} class="underline ">skip (${this.state.skippers}/${this.state.needed})</button>
             </div>
             </div>
             
@@ -149,7 +157,10 @@ const Room = () => {
     <//>
     <div class="px-2 sm:px-8">
     <${Player}/>
-    <${Search}/>
+    <div class="flex justify-between mb-2">
+        <h3 class="font-bold">Up next:</h3>
+        <${Search}/>
+    </div>
     <${Queue}/>
     </div>
     ` 
