@@ -8,7 +8,7 @@ function Search() {
     const closeSearchUI = () => { setIsSearchOpen(false) }
     
     if (!isSearchOpen) return html`
-        <button onClick=${openSearchUI}>open search</button>
+        <button onClick=${openSearchUI} class="underline">open search</button>
     `
     
     
@@ -41,9 +41,9 @@ function Search() {
         }
         return searchResults.items.map((i) => {
             return html`
-                <button onClick=${addToQueue} data-song-uri=${i.uri} class="w-full bg-gray-200 border mb-2 rounded-lg hover:bg-gray-300">   
+                <button onClick=${addToQueue} data-song-uri=${i.uri} class="w-full bg-gray-200 border mb-2 rounded-lg hover:bg-gray-300 p-1">   
                     <div class="pointer-events-none">
-                        ${i.name} — ${i.artists[0].name} <span class="opacity-50">${i.uri}</span>
+                        ${i.name} — ${i.artists[0].name} <!--<span class="opacity-50">${i.uri}</span>-->
                     </div>
                 
                 </button>
@@ -53,7 +53,7 @@ function Search() {
     
     return (
         html`
-        <button onClick=${openSearchUI}>open search</button>
+        <button onClick=${openSearchUI} class="underline">open search</button>
         <div class="h-full w-full fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-50 z-50 p-8 overflow-scroll">
             <div class="base mx-auto m-8">
               <div class="bg-white text-black p-8 py-10  w-full rounded-lg shadow-lg overflow-scroll relative">
@@ -66,9 +66,9 @@ function Search() {
                       <button type="submit" class="mt-2 bg-page-bg w-full py-2 text-page-contrast rounded">Search</button>
                   </form>
                   <div>
-                      Results: please ignore bad ui
+                      Results:
                       
-                      ${searchResults ? Options() : "empty"}
+                      ${searchResults ? Options() : " nothing yet"}
                   </div>
               </div>
     
