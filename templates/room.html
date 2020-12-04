@@ -51,11 +51,13 @@ class Player extends Component {
         })
         
         _defineProperty(this, "playpause", (ev) => {
+            {% if admin %}
             socket.emit('playpause', roomCode);
             console.log('sent playpause');
             ev.preventDefault();
             this.fetchData()
             this.setState({playing:!this.state.playing})
+            {% endif %}
         })
         
         _defineProperty(this, "skip", (ev) => {
@@ -113,12 +115,18 @@ class Player extends Component {
                     />
                 </div> 
             </div>
-            <div class="flex justify-between px-3 sm:px-10 py-4">
-            <button onClick=${this.playpause} class="underline">${this.state.playing? 'pause' : 'play'}</button>
-            <div class="flex-grow text-center">
+            <div class="px-3 sm:px-10 py-4">
+            <div class="text-center">
             ${this.state.spotifyData ? this.state.spotifyData.item.name : '...' } — ${this.state.spotifyData ? this.state.spotifyData.item.artists[0].name : '...'}
             </div>
-            <button onClick=${this.skip} class="underline">skip</button>
+            <div class="flex items-center justify-center">
+            {% if admin %}
+            <button onClick=${this.playpause} class="text-right underline">${this.state.playing? 'pause' : 'play'}</button>
+            <button onClick=${this.skip} class="underline ml-1">skip</button>
+            {% else %}
+            <button onClick=${this.skip} class="underline ">skip</button>
+            {% endif %}
+            </div>
             </div>
             
             `
