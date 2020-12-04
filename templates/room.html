@@ -6,7 +6,7 @@
 {%endblock%}
 {%block code %}
 
-{{component_import("PaletteIndicator", "Search")}}
+{{component_import("PaletteIndicator", "Search", "useKeyPress")}}
 
 let socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function() {
