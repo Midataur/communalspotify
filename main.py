@@ -108,6 +108,12 @@ def vote_song(code, uri, sign):
     if abs(sign) >= 1:
         r.zincrby(code+'q', sign, uri)
 
+        if not r.hexists(code, 'queuer_id'):
+            print('spawning queuer')
+            queue_most_voted(code)
+        
+        socketio.emit('queue_change', room=code, broadcast=True)
+
 #this is not a socket route but it does send a socket
 def queue_most_voted(roomcode):
     global scheduler
@@ -150,10 +156,11 @@ def queue_most_voted(roomcode):
 
         else:
             print('no song to queue')
-            #check again in 5 seconds
-            time_to_trigger = datetime.now()+timedelta(seconds=5)
+            r.hdel(roomcode, 'queuer_id')
+            return None
 
-    scheduler.add_job(queue_most_voted, 'date', run_date=time_to_trigger, args=[roomcode])
+    job = scheduler.add_job(queue_most_voted, 'date', run_date=time_to_trigger, args=[roomcode])
+    r.hset(roomcode, 'queuer_id', job.id)
 
 
 ### ROUTES ###
@@ -185,9 +192,6 @@ def actual_create():
         auth_result = get_api_token(request.args['code'])
         roomcode = generate_roomcode()
         create_room(roomcode,auth_result)
-
-        scheduler.add_job(queue_most_voted, args=[roomcode])
-
         r = redis_instance()
         authCode = r.hget(roomcode,'access_token')
 
