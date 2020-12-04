@@ -20,8 +20,8 @@ socket.on('skip_progress', function( data ) {
     console.log(skippers+' out of '+needed+' have skipped');
 });
 
-socket.on('queued_song', function( uri ) {
-    console.log('queued song '+uri);
+socket.on('queue_change', function( ) {
+    console.log('queued song');
 });
 
 class Player extends Component {
@@ -104,7 +104,7 @@ class Player extends Component {
                 ${this.state.palette ? this.getCSSPaletteVars(this.state.colourProfile) : ''}
             }
             </style>
-            <${PaletteIndicator} paletteStr=${this.state.palette ? JSON.stringify(this.state.palette) : false} profileInUse=${this.state.colourProfile} />
+            <!--<${PaletteIndicator} paletteStr=${this.state.palette ? JSON.stringify(this.state.palette) : false} profileInUse=${this.state.colourProfile} />-->
             <div class="">
                 <div class="relative aspect-ratio-square rounded-lg">
                     <!--<img 

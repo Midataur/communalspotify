@@ -77,7 +77,7 @@ def room_checkup(roomcode):
 
         #seppuku
         print('goodbye room',roomcode)
-        scheduler.remove_job('job_id')
+        scheduler.remove_job(job_id)
 
     else:
         renew_token(roomcode)
