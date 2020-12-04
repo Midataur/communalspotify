@@ -6,12 +6,13 @@
 {%endblock%}
 {%block code %}
 
-{{component_import("PaletteIndicator", "Search", "useKeyPress")}}
+{{component_import("PaletteIndicator", "Search", "useKeyPress", "Queue")}}
 
 let socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function() {
     socket.emit('room_connect','{{roomcode}}');
 });
+
 
 socket.on('skip_progress', function( data ) {
     let skippers = data[0];
@@ -149,6 +150,7 @@ const Room = () => {
     <div class="px-2 sm:px-8">
     <${Player}/>
     <${Search}/>
+    <${Queue}/>
     </div>
     ` 
 }
