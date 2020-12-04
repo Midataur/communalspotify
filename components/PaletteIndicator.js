@@ -1,7 +1,7 @@
 const PaletteIndicator = ({paletteStr, profileInUse}) => {
     
     if (paletteStr == false) {return html`
-    <div class="fixed top-0 right-0 border-l-2 border-b-2 border-page-contrast">
+    <div class="fixed top-0 right-0 border-l-2 border-b-2 border-page-contrast z-40">
         <div class="tracking-wider px-2 bg-page-contrast text-page-bg">COLOUR PALETTE</div>
         <div class="px-2">Loading...</div>
     </div>
@@ -10,7 +10,7 @@ const PaletteIndicator = ({paletteStr, profileInUse}) => {
     
     
     const palette = JSON.parse(paletteStr)
-    console.log(palette)
+    //console.log(palette)
     const lines = Object.keys(palette).map((key) => {
         const rgbArray = palette[key].rgb
         const rgbColor = `rgb(${rgbArray.join(",")})`
