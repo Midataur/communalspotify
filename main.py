@@ -58,6 +58,9 @@ def get_current_queue():
     r = redis_instance()
     queue = r.zrange(roomcode+'q', 0,-1, withscores=True)
 
+    if not len(queue):
+        return Response('[]', mimetype='application/json')
+
     tracks_info = get_tracks_info([x[0].decode('utf-8') for x in queue], roomcode)
     tracks = proccess_tracks(zip(tracks_info,[x[1] for x in queue]))
 
@@ -130,9 +133,10 @@ def queue_most_voted(roomcode):
     else:
         #otherwise queue the next song
         r = redis_instance()
-        highest_song = r.zpopmax(roomcode+'q')[0][0].decode('utf-8')
+        highest_song = r.zpopmax(roomcode+'q')
         #check that there are songs in the queue
-        if highest_song:
+        if len(highest_song):
+            highest_song = highest_song[0][0].decode('utf-8')
             print('queueing song',highest_song)
             queue_song(roomcode, highest_song)
             socketio.emit('queued_song', highest_song, room=roomcode, broadcast=True)
