@@ -50,6 +50,13 @@ function Queue({}) {
    
   
   if (!queueData) return html`loading... <button onClick=${fetchQueue}>reload</button>`
+  console.log(queueData)
+  if (queueData.length === 0) return html`
+    <div class="border-2 rounded-lg border-dashed border-page-contrast p-4 text-center">
+      <div class="text-lg mb-1">Looks like there are no songs in the queue.</div>
+      <div class="text-base opacity-75">Try adding some by pressing "open search"</div>
+    </div>
+  `
   
   const QueueList = queueData.map(({score, image, uri, name, artist})=> html`
   <${QueueItem}
