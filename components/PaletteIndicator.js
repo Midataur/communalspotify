@@ -10,7 +10,7 @@ const PaletteIndicator = ({paletteStr, profileInUse}) => {
     
     
     const palette = JSON.parse(paletteStr)
-    console.log(palette)
+    //console.log(palette)
     const lines = Object.keys(palette).map((key) => {
         const rgbArray = palette[key].rgb
         const rgbColor = `rgb(${rgbArray.join(",")})`
