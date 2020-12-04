@@ -2,6 +2,7 @@ from flask import Flask, request, url_for, render_template, make_response, Marku
 from flask_socketio import SocketIO, join_room, leave_room
 from apscheduler.schedulers.background import BackgroundScheduler
 from non_routes import *
+from datetime import datetime, timedelta
 import time
 import json
 import random
@@ -57,7 +58,7 @@ def get_current_queue():
     r = redis_instance()
     queue = r.zrange(roomcode+'q', 0,-1, withscores=True)
 
-    tracks_info = get_tracks_info([x[0] for x in queue], roomcode)
+    tracks_info = get_tracks_info([x[0].decode('utf-8') for x in queue], roomcode)
     tracks = proccess_tracks(zip(tracks_info,[x[1] for x in queue]))
 
     return Response(json.dumps(tracks), mimetype='application/json')
@@ -99,14 +100,57 @@ def vote_skip(code, uid):
 def vote_song(code, uri, sign):
     #sign is +1 for upvote and -1 for downvote
     r = redis_instance()
+
     #little bit of server side security
     if abs(sign) >= 1:
-        r.zincrby(str(code)+'q', sign, uri)
+        r.zincrby(code+'q', sign, uri)
 
 #this is not a socket route but it does send a socket
 def queue_most_voted(roomcode):
-    r = redis_instance()
-    highest = r.zpopmax(roomcode+'q')
+    global scheduler
+
+    print('checking queue for', roomcode)
+
+    #get time left on current track
+    playback_info = play_state(roomcode)
+    cur_song = playback_info['item']['uri']
+
+    cur_track_info = get_tracks_info([cur_song], roomcode)[0]
+    cur_duration = cur_track_info['duration_ms']
+
+    latency = time.time()*1000-playback_info['timestamp']
+    progress = playback_info['progress_ms'] + latency
+
+    time_left = cur_duration-progress
+    
+    #if more than 100 ms left, wait till next song
+    if time_left >= 100:
+        print('waiting for song to end')
+        time_to_trigger = datetime.now()+timedelta(milliseconds=time_left-50)
+    else:
+        #otherwise queue the next song
+        r = redis_instance()
+        highest_song = r.zpopmax(roomcode+'q')[0][0].decode('utf-8')
+        #check that there are songs in the queue
+        if highest_song:
+            print('queueing song',highest_song)
+            queue_song(roomcode, highest_song)
+            socketio.emit('queued_song', highest_song, room=roomcode, broadcast=True)
+
+            #get info on how long the next song is
+            track_info = get_tracks_info([highest_song], roomcode)[0]
+            til_next = track_info['duration_ms']
+            print('next trigger in',til_next/1000,'seconds')
+
+            time_to_trigger = datetime.now()+timedelta(milliseconds=til_next)
+
+        else:
+            print('no song to queue')
+            #check again in 5 seconds
+            time_to_trigger = datetime.now()+timedelta(seconds=5)
+
+    scheduler.add_job(queue_most_voted, 'date', run_date=time_to_trigger, args=[roomcode])
+
 
 ### ROUTES ###
 
@@ -137,6 +181,8 @@ def actual_create():
         auth_result = get_api_token(request.args['code'])
         roomcode = generate_roomcode()
         create_room(roomcode,auth_result)
+
+        scheduler.add_job(queue_most_voted, args=[roomcode])
 
         r = redis_instance()
         authCode = r.hget(roomcode,'access_token')

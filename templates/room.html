@@ -19,6 +19,9 @@ socket.on('skip_progress', function( data ) {
     console.log(skippers+' out of '+needed+' have skipped');
 });
 
+socket.on('queued_song', function( uri ) {
+    console.log('queued song '+uri);
+});
 
 class Player extends Component {
     constructor() {

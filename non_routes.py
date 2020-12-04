@@ -159,7 +159,7 @@ def skip_song(code):
 
 def get_tracks_info(uris, roomcode):
     #chop off the resource type to get the spotify ids
-    spot_ids = [x[14:].decode('utf-8') for x in uris]
+    spot_ids = [x[14:] for x in uris]
 
     r = redis_instance()
     token = r.hget(str(roomcode),'access_token').decode('utf-8')
