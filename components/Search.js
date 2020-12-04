@@ -1,7 +1,9 @@
+// Requires: useKeyPress
+
 function Search() {
 
     const [isSearchOpen, setIsSearchOpen] = useState(false)
-    
+
     const openSearchUI = () => { setIsSearchOpen(true) }
     const closeSearchUI = () => { setIsSearchOpen(false) }
     
@@ -9,8 +11,12 @@ function Search() {
         <button onClick=${openSearchUI}>open search</button>
     `
     
+    
+    const escPress = useKeyPress('Escape');
     const [value, setValue] = useState("")
     const [searchResults, setSearchResults] = useState(false)
+    
+    if (escPress) closeSearchUI()
     
     const onSubmit = e => {
         fetch(`/api/search?q=${value}&roomcode=${roomCode}&limit=10`)
