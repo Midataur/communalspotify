@@ -145,7 +145,7 @@ def queue_most_voted(roomcode):
             highest_song = highest_song[0][0].decode('utf-8')
             print('queueing song',highest_song)
             queue_song(roomcode, highest_song)
-            socketio.emit('queued_song', highest_song, room=roomcode, broadcast=True)
+            socketio.emit('queue_change', room=code, broadcast=True)
 
             #get info on how long the next song is
             track_info = get_tracks_info([highest_song], roomcode)[0]
