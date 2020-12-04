@@ -1,8 +1,14 @@
 function QueueItem({ uri, imageSrc, artist, title, voteCount }) {
-  const queueVoteSong = () => {
-      voteSong(uri, roomCode, +1)
-  }
   const alreadyVoted = getPreviouslyVotedSongs().includes(uri)
+  const queueVoteSong = () => {
+      if (alreadyVoted) {
+        voteSong(uri, roomCode, -1)
+        removeSongFromLocalStorage(uri)
+      } else {
+        voteSong(uri, roomCode, +1)
+      }
+      
+  }
   return html`
     <div class="flex bg-page-contrast rounded-lg text-black items-center mb-4 shadow">
       <!--(art) (title / artist) (votebutton / counter) -->
@@ -32,9 +38,7 @@ function QueueItem({ uri, imageSrc, artist, title, voteCount }) {
 }
 
 function Queue({}) {
-  const [queueData, setQueueData] = useState(false);
-  
-  
+  const [queueData, setQueueData] = useState([]);
   
   const fetchQueue = () =>
     fetch(`/api/getCurrentQueue?roomcode=${roomCode}`)
@@ -43,9 +47,24 @@ function Queue({}) {
       .catch(() => {
         error: "fetching queue state failed";
       })
-      //.then(() => console.log(queueData));
+      .then(() => console.log("Queue", queueData))
   
-  useEffect(()=>{fetchQueue()}, [])
+  // so it dont run on every frame lol.
+  // ie, only run on component mount and dismount.
+  useEffect(()=>{
+    fetchQueue()
+    socket.on('queue_change', function( ) {
+      console.log('queued song');
+      fetchQueue()
+      /*const prevVotesSet = new Set(getPreviouslyVotedSongs())
+      console.log("fetchQueue/prevVotes",prevVotesSet)
+      const queueDataSet = queueData.map(i => i.foo);
+      console.log("fetchQueue/queue",queueDataSet)
+      const diff = [...prevVotesSet].filter(x => !queueDataSet.includes(x) );
+      console.log("fetchQueue/diff",diff)*/
+  });
+  }, [])
+  
   
    
   
@@ -68,8 +87,7 @@ function Queue({}) {
   />
   `)  
     
-  return html`
-    <h3>Up next:</h3>   <button onClick=${fetchQueue}>reload</button>  
+  return html` 
      ${QueueList}
   `;
 }
