@@ -90,20 +90,22 @@ def playpause(code):
     r = redis_instance()
     token = r.hget(str(code),'access_token').decode('utf-8')
 
-    headers = {'Authorization': f'Bearer {token}'}
-    url = f'https://api.spotify.com/v1/me/player/{status}'
-    requests.put(url,headers=headers)
-
-    #stop the queue job
     job_id = r.hget(code, 'queuer_id')
     if status == 'pause':
+        #stop the queue job
         if job_id and scheduler.get_job(job_id.decode('utf-8')):
             print('removing queuer')
             scheduler.remove_job(job_id.decode('utf-8'))
     else:
+        #start the queue job
         if not job_id or not scheduler.get_job(job_id.decode('utf-8')):
             print('spawning queuer')
             queue_most_voted(code)
+
+    #actually toggle
+    headers = {'Authorization': f'Bearer {token}'}
+    url = f'https://api.spotify.com/v1/me/player/{status}'
+    requests.put(url,headers=headers)
 
 @socketio.on('vote-skip')
 def vote_skip(code, uid):
