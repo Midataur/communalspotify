@@ -181,6 +181,9 @@ def queue_most_voted(roomcode, override=False):
             socketio.emit('queue_change', room=roomcode, broadcast=True)
             socketio.emit('song-change', room=roomcode, broadcast=True)
 
+            if time_left <= 0:
+                skip_song(roomcode)
+
             #get info on how long the next song is
             track_info = get_tracks_info([highest_song], roomcode)[0]
             til_next = track_info['duration_ms']
