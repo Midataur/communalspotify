@@ -175,7 +175,7 @@ def queue_most_voted(roomcode, override=False):
         #check that there are songs in the queue
         if len(highest_song):
             highest_song = highest_song[0][0].decode('utf-8')
-
+            queue_song(roomcode, highest_song)
             socketio.emit('queue_change', room=roomcode, broadcast=True)
 
             #if we missed the window forceably play
