@@ -118,7 +118,7 @@ def vote_skip(code, uid):
     r.sadd(code+'s', uid)
 
     skippers = r.scard(code+'s')
-    total = r.scard(code+'p')
+    total = max(1, r.scard(code+'p'))
 
     if skippers >= total//2:
         r.delete(code+'s')

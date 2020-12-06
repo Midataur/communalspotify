@@ -49,7 +49,7 @@ class Player extends Component {
             fetch(`/api/getRoomSize?roomcode=${roomCode}`)
               .then((r) => r.json())
               //.catch(() => {error:'fetching size failed'})
-              .then((data) => this.setState({ needed: Math.floor(data['size']/2) }))
+              .then((data) => this.setState({ needed: Math.max(Math.floor(data['size']/2),1) }))
               
         })
         
@@ -97,6 +97,7 @@ class Player extends Component {
             console.log("room/skip_progress socket", this.state)
         })
         socket.on('song-change', () => {
+            this.fetchData();
             console.log("room/song-change socket",this.state)
         });
         
