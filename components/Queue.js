@@ -40,29 +40,36 @@ function QueueItem({ uri, imageSrc, artist, title, voteCount }) {
 function Queue({}) {
   const [queueData, setQueueData] = useState([]);
   
-  const fetchQueue = () =>
-    fetch(`/api/getCurrentQueue?roomcode=${roomCode}`)
-      .then((r) => r.json())
-      .then((data) => setQueueData(data.sort((a,b) => b.score- a.score)))
-      .catch(() => {
-        error: "fetching queue state failed";
-      })
-      .then(() => console.log("Queue", queueData))
+  const fetchQueue = () => {
+    var json = fetch(`/api/getCurrentQueue?roomcode=${roomCode}`).then((r) => r.json())
+    //btw i apologise if my code is not elegant, idek what a promise was until just now
+    json.then((data) => setQueueData(data.sort((a,b) => b.score- a.score)))
+        .catch(() => {
+          error: "fetching queue state failed";
+        })
+        .then(() => console.log("Queue", queueData));
+    
+    return json;
+  }
   
   // so it dont run on every frame lol.
   // ie, only run on component mount and dismount.
   useEffect(()=>{
     fetchQueue()
-    socket.on('queue_change', function( ) {
+    socket.on('queue_change', (async function( ) {
       console.log('queued song');
-      fetchQueue()
-      /*const prevVotesSet = new Set(getPreviouslyVotedSongs())
-      console.log("fetchQueue/prevVotes",prevVotesSet)
-      const queueDataSet = queueData.map(i => i.foo);
-      console.log("fetchQueue/queue",queueDataSet)
-      const diff = [...prevVotesSet].filter(x => !queueDataSet.includes(x) );
-      console.log("fetchQueue/diff",diff)*/
-  });
+
+      const rawJson = await fetchQueue();
+      console.log(rawJson)
+
+      const prevVotesSet = new Set(getPreviouslyVotedSongs());
+      console.log("fetchQueue/prevVotes",prevVotesSet);
+      const queueDataSet = rawJson.map(i => i['uri']);
+      console.log("fetchQueue/queue",queueDataSet);
+      const intersection = [...prevVotesSet].filter(x => queueDataSet.includes(x) );
+      console.log("fetchQueue/intersection",intersection);
+      
+  }));
   }, [])
   
   

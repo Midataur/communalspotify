@@ -132,7 +132,10 @@ def play_state(code):
 
     resp = requests.get(url, headers=headers)
 
-    return resp.json()
+    try:
+        return resp.json()
+    except json.decoder.JSONDecodeError:
+        return None
 
 def queue_song(code, uri):
     params = {

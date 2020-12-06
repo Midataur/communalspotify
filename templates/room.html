@@ -12,7 +12,10 @@ let socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function() {
     socket.emit('room_connect','{{roomcode}}');
 });
-
+/*
+socket.on('queue_change', function() {
+    console.log('queue change!')
+});*/
 
 class Player extends Component {
     constructor() {

@@ -53,7 +53,6 @@ def get_play_state():
     #check on the queue
     job_id = r.hget(roomcode, 'queuer_id')
     if not job_id or not scheduler.get_job(job_id.decode('utf-8')):
-        print('spawning queuer')
         queue_most_voted(roomcode)
 
     return play_state(roomcode)
@@ -94,12 +93,10 @@ def playpause(code):
     if status == 'pause':
         #stop the queue job
         if job_id and scheduler.get_job(job_id.decode('utf-8')):
-            print('removing queuer')
             scheduler.remove_job(job_id.decode('utf-8'))
     else:
         #start the queue job
         if not job_id or not scheduler.get_job(job_id.decode('utf-8')):
-            print('spawning queuer')
             queue_most_voted(code)
 
     #actually toggle
@@ -135,23 +132,18 @@ def vote_song(roomcode, uri, sign):
     #sign is +1 for upvote and -1 for downvote
     r = redis_instance()
 
-    #little bit of server side security
-    if abs(sign) >= 1:
-        r.zincrby(roomcode+'q', sign, uri)
+    r.zincrby(roomcode+'q', sign, uri)
+    socketio.emit('queue_change', room=code, broadcast=True)
 
-        #check on the queue
-        job_id = r.hget(roomcode, 'queuer_id')
-        if not job_id or not scheduler.get_job(job_id.decode('utf-8')):
-            print('spawning queuer')
-            queue_most_voted(roomcode)
-        
-        socketio.emit('queue_change', room=roomcode, broadcast=True)
+    #check on the queue
+    job_id = r.hget(roomcode, 'queuer_id')
+    if not job_id or not scheduler.get_job(job_id.decode('utf-8')):
+        queue_most_voted(roomcode)
 
 #this is not a socket route but it does send a socket
 def queue_most_voted(roomcode, override=False):
     global scheduler
     r = redis_instance()
-    print('checking queue for', roomcode)
 
     a=time.time()*1000
 
