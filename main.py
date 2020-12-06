@@ -73,12 +73,16 @@ def get_current_queue():
 
     return Response(json.dumps(tracks), mimetype='application/json')
 
-@app.route('/api/getRoomSize')
+@app.route('/api/getSkipState')
 def get_room_size():
     r = redis_instance()
     roomcode = request.args['roomcode']
+
+    skippers = r.scard(roomcode+'s')
     total = r.scard(roomcode+'p')
-    return { 'size': total }
+
+    data = { 'skippers': skippers, 'size': total }
+    return Response(json.dumps(data), mimetype='application/json')
 
 ### SOCKETS ###
 
