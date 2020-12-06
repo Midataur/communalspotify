@@ -68,6 +68,7 @@ function Queue({}) {
       console.log("fetchQueue/queue",queueDataSet);
       const intersection = [...prevVotesSet].filter(x => queueDataSet.includes(x) );
       console.log("fetchQueue/intersection",intersection);
+      localStorage.setItem('votedSongs', JSON.stringify({ [roomCode]: intersection}));
       
   }));
   }, [])

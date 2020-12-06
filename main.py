@@ -133,7 +133,7 @@ def vote_song(roomcode, uri, sign):
     r = redis_instance()
 
     r.zincrby(roomcode+'q', sign, uri)
-    socketio.emit('queue_change', room=code, broadcast=True)
+    socketio.emit('queue_change', room=roomcode, broadcast=True)
 
     #check on the queue
     job_id = r.hget(roomcode, 'queuer_id')

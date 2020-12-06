@@ -96,7 +96,7 @@
 		}
 
 		function addVotedSong(uri){
-			const currentVotedSongs = getPreviouslyVotedSongs()
+			const currentVotedSongs = getPreviouslyVotedSongs();
 			currentVotedSongs.push(uri)
 			localStorage.setItem('votedSongs', JSON.stringify({ [roomCode]: currentVotedSongs}));
 		}
@@ -107,7 +107,7 @@
 			console.log("currentVotedSongs", currentVotedSongs)
 			localStorage.setItem('votedSongs', JSON.stringify({ [roomCode]: currentVotedSongs}));
 		}
-		
+	
 		function voteSong(uri, roomcode, sign){
 			if (!localStorage.getItem("votedSongs")) localStorage.setItem("votedSongs",`{"${roomCode}": []}`)
 			if (!JSON.parse(localStorage.getItem("votedSongs"))[roomCode]) localStorage.setItem("votedSongs",`{"${roomCode}": []}`)
