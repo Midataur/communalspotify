@@ -169,7 +169,6 @@ def queue_most_voted(roomcode, override=False):
         r.hdel(roomcode, 'queuer_id')
         return None
     else:
-        socketio.emit('song-change', room=roomcode, broadcast=True)
         #queue the next song
         highest_song = r.zpopmax(roomcode+'q')
         #check that there are songs in the queue
@@ -191,6 +190,7 @@ def queue_most_voted(roomcode, override=False):
         else:
             r.hdel(roomcode, 'queuer_id')
             return None
+        socketio.emit('song-change', room=roomcode, broadcast=True)
 
     job = scheduler.add_job(queue_most_voted, 'date', run_date=time_to_trigger, args=[roomcode])
     r.hset(roomcode, 'queuer_id', job.id)
