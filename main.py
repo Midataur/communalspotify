@@ -55,7 +55,8 @@ def get_play_state():
     if not job_id or not scheduler.get_job(job_id.decode('utf-8')):
         queue_most_voted(roomcode)
 
-    return play_state(roomcode)
+    state = play_state(roomcode)
+    return state if state else ''
 
 @app.route('/api/getCurrentQueue')
 def get_current_queue():
@@ -71,6 +72,13 @@ def get_current_queue():
     tracks = proccess_tracks(zip(tracks_info,[x[1] for x in queue]))
 
     return Response(json.dumps(tracks), mimetype='application/json')
+
+@app.route('/api/getRoomSize')
+def get_room_size():
+    r = redis_instance()
+    roomcode = request.args['roomcode']
+    total = r.scard(roomcode+'p')
+    return { 'size': total }
 
 ### SOCKETS ###
 
@@ -123,6 +131,8 @@ def vote_skip(code, uid):
             queue_most_voted(code, override=True)
         
         skip_song(code)
+        #resets the number shown to the user via the socket
+        skippers = 0
     
     socketio.emit('skip_progress', [skippers, total//2], room=code, broadcast=True)
 
@@ -145,48 +155,36 @@ def queue_most_voted(roomcode, override=False):
     global scheduler
     r = redis_instance()
 
-    a=time.time()*1000
-
-    #get time left on current track
-    playback_info = play_state(roomcode)
-    cur_song = playback_info['item']['uri']
-    
-    cur_track_info = get_tracks_info([cur_song], roomcode)[0]
-    cur_duration = cur_track_info['duration_ms']
-
-    b=time.time()*1000
-
-    latency = b-a
-    progress = playback_info['progress_ms'] + latency
-    time_left = cur_duration-progress
+    time_left = get_time_left(roomcode)
 
     #if there's more than 2000 ms left, wait till next song
-    if (time_left >= 2000 or not playback_info['is_playing']) and not override:
-        print('waiting for song to end')
+    if (time_left >= 2000 and time_left != float('inf')) and not override:
         time_to_trigger = datetime.now()+timedelta(milliseconds=time_left-1000)
+    elif time_left == float('inf'):
+        #song is paused or there is no active device
+        r.hdel(roomcode, 'queuer_id')
+        return None
     else:
-        #otherwise queue the next song
+        socketio.emit('song-change', room=roomcode, broadcast=True)
+        #queue the next song
         highest_song = r.zpopmax(roomcode+'q')
         #check that there are songs in the queue
         if len(highest_song):
             highest_song = highest_song[0][0].decode('utf-8')
-            print('queueing song',highest_song, time_left)
-            queue_song(roomcode, highest_song)
-            socketio.emit('queue_change', room=roomcode, broadcast=True)
-            socketio.emit('song-change', room=roomcode, broadcast=True)
 
+            socketio.emit('queue_change', room=roomcode, broadcast=True)
+
+            #if we missed the window forceably play
             if time_left <= 0:
                 skip_song(roomcode)
 
             #get info on how long the next song is
             track_info = get_tracks_info([highest_song], roomcode)[0]
             til_next = track_info['duration_ms']
-            print('next trigger in',til_next/1000,'seconds')
 
             time_to_trigger = datetime.now()+timedelta(milliseconds=til_next)
 
         else:
-            print('no song to queue')
             r.hdel(roomcode, 'queuer_id')
             return None
 

@@ -44,8 +44,12 @@ class Player extends Component {
                   spotifyData: data
               }))
               .then(()=> this.getColours(this.state.spotifyData.item.album.images[0].url))
-              .then((palette) => this.setState({palette}))
-              //.then(()=>console.log(this.state))
+              .then((palette) => this.setState({palette}));
+
+            fetch(`/api/getRoomSize?roomcode=${roomCode}`)
+              .then((r) => r.json())
+              //.catch(() => {error:'fetching size failed'})
+              .then((data) => this.setState({ needed: Math.floor(data['size']/2) }))
               
         })
         
@@ -91,14 +95,8 @@ class Player extends Component {
                 needed: Math.max(1, data[1])
             })   
             console.log("room/skip_progress socket", this.state)
-            setTimeout(() => {  this.setState({
-                skippers: 0,
-            }) }, 15000);
         })
         socket.on('song-change', () => {
-            this.setState({
-                skippers: 0,
-            })
             console.log("room/song-change socket",this.state)
         });
         

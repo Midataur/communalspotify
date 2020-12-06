@@ -192,3 +192,27 @@ def proccess_tracks(tracks):
         new_tracks.append(data)
     
     return new_tracks
+
+def get_time_left(roomcode):
+
+    a=time.time()*1000
+
+    #get time left on current track
+    playback_info = play_state(roomcode)
+
+    #check if a song is actually playing
+    if playback_info is None or not playback_info['is_playing']:
+        return float('inf')
+    
+    cur_song = playback_info['item']['uri']
+    
+    cur_track_info = get_tracks_info([cur_song], roomcode)[0]
+    cur_duration = cur_track_info['duration_ms']
+
+    b=time.time()*1000
+
+    latency = b-a
+    progress = playback_info['progress_ms'] + latency
+    time_left = cur_duration-progress
+
+    return time_left
