@@ -132,7 +132,8 @@ def vote_skip(code, uid):
         job_id = r.hget(code, 'queuer_id')
         if job_id and scheduler.get_job(job_id.decode('utf-8')):
             scheduler.remove_job(job_id.decode('utf-8'))
-            queue_most_voted(code, override=True)
+            
+        queue_most_voted(code, override=True)
         
         skip_song(code)
         #resets the number shown to the user via the socket
