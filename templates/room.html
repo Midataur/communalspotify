@@ -135,8 +135,14 @@ class Player extends Component {
                 </div> 
             </div>
             <div class="px-3 sm:px-10 py-4">
-            <div class="text-center">
+            <div class="flex items-center justify-center leading-none py-2">
             ${this.state.spotifyData ? this.state.spotifyData.item.name : '...' } — ${this.state.spotifyData ? this.state.spotifyData.item.artists[0].name : '...'}
+            <a 
+                href="${this.state.spotifyData ? this.state.spotifyData.item.uri : '#'}"
+                class="ml-2 flex"
+            >
+                <i class='bx bxl-spotify leading-none'></i>
+            </a>
             </div>
             <div class="flex items-center justify-center">
             {% if admin %}
