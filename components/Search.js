@@ -54,7 +54,7 @@ function Search() {
     return (
         html`
         <button onClick=${openSearchUI} class="underline">open search</button>
-        <div class="h-full w-full fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-50 z-50 p-8 overflow-scroll">
+        <div class="h-full w-full fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-50 z-50 p-8 sm:px-8 px-1 overflow-scroll">
             <div class="base mx-auto m-8">
               <div class="bg-white text-black p-8 py-10  w-full rounded-lg shadow-lg overflow-scroll relative">
                   <div class="top-0 right-0 absolute">
